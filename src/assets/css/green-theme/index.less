@@ -21,7 +21,9 @@ html,body,#app,.wrapper{
 body{
     font: 14px/24px "Helvetica Neue",Helvetica, "microsoft yahei", arial, STHeiTi, sans-serif;
 }
-a{text-decoration: none}
+a{
+    text-decoration: none
+}
 .content{
     background: none repeat scroll 0 0 #fff;
     position: absolute;
@@ -30,12 +32,24 @@ a{text-decoration: none}
     top: 70px;
     bottom:0;
     width: auto;
-    padding:40px;
     box-sizing: border-box;
     overflow-y: scroll;
-}
-.crumbs{
-    margin-bottom: 20px;
+
+    .crumbs{
+        font-size: 14px;
+        line-height: 40px;
+        border-bottom: 1px solid #ccc;
+        padding-left: 20px;
+
+        > span:last-child{
+            color: #8a8a8a;
+            font-weight: 400;
+        }
+    }
+
+    .router-box{
+        padding: 20px;
+    }
 }
 
 .clearfix{

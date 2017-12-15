@@ -26,28 +26,22 @@ export default {
       this.isSignOut = true;
       const _this = this;
       this.$http
-        .post("/ccmc/logout", this.loginData)
+        .post("/logout", this.loginData)
         .then(function(res) {
-          console.log(res);
+          // console.log(res);
+          localStorage.clear();
           _this.$Message.success("退出成功!");
           _this.isSignOut = false;
-          localStorage.clear()
-          //   _this.$router.push("/login");
+          _this.$router.push("/");
         })
         .catch(function(err) {
           console.log(err);
-          _this.$Message.error("退出失败!");
+          _this.$Notice.error({title: "退出失败!"});
           _this.isSignOut = false;
         });
     }
   }
-  // handleCommand(command) {
-  //     if(command == 'loginout'){
-  //         localStorage.removeItem('ms_username')
-  //         this.$router.push('/login');
-  //     }
-  // }
-};
+}
 </script>
 <style lang="less" scoped>
 .header {

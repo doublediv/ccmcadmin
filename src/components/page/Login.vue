@@ -2,15 +2,15 @@
     <div class="login-box">
         <Card class="login-card" :padding="0" :bordered="false">
             <div class="card-header"><img src="~@/assets/img/login_logo.png" alt="" /></div>
-            <Form class="login-form" ref="login" :model="loginData" :rules="ruleLogin" :label-width="60">
-                <FormItem label="帐号：" prop="user">
-                    <Input type="text" v-model="loginData.user" placeholder="请输入帐号"></Input>
+            <Form class="login-form" ref="loginForm" :model="loginData" :rules="ruleLogin" :label-width="60">
+                <FormItem label="帐号：" prop="username">
+                    <Input type="text" v-model="loginData.username" placeholder="请输入帐号"></Input>
                 </FormItem>
                 <FormItem label="密码：" prop="password">
                     <Input type="password" v-model="loginData.password" placeholder="请输入密码"></Input>
                 </FormItem>
                 <FormItem>
-                    <Button type="primary" long :loading="isLogin" @click="signIn('login')">登录</Button>
+                    <Button type="primary" long :loading="isLogin" @click="signIn('loginForm')">登录</Button>
                 </FormItem>
             </Form>
         </Card>
@@ -22,12 +22,12 @@ export default {
     return {
       isLogin: false,
       loginData: {
-        user: "admin",
+        username: "admin",
         password: "admin"
       },
       test: [{ a: 1 }, { b: 2 }],
       ruleLogin: {
-        user: [{ required: true, message: "请输入帐号" }],
+        username: [{ required: true, message: "请输入帐号" }],
         password: [{ required: true, message: "请输入密码" }]
       }
     };
@@ -38,20 +38,20 @@ export default {
       this.$refs[name].validate(valid => {
         if (valid) {
           this.isLogin = true;
-          //   localStorage.clear()
-          localStorage.setItem("username", this.loginData.user);
           const _this = this;
           this.$http
-            .post("/ccmc/login", this.loginData)
+            .post("/login", this.loginData)
             .then(function(res) {
-              console.log(res);
+              // console.log(res);
+              localStorage.setItem("username", res.data.user.userName);
+              localStorage.setItem("sidebarnav", JSON.stringify(res.data.user.permission));
               _this.$Message.success("登录成功!");
               _this.isLogin = false;
-              //   _this.$router.push("/home");
+              _this.$router.push("/home");
             })
             .catch(function(err) {
               console.log(err);
-              _this.$Message.error("登录失败!");
+              _this.$Notice.error({title: "登录失败!"});
               _this.isLogin = false;
             });
         }

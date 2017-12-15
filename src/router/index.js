@@ -25,6 +25,24 @@ export default new Router({
       // meta: {
       //     requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
       // }
+      children: [
+        {
+          path: '/vipdata/addvip',
+          name: '新增会员',
+          component: resolve => require(['../components/page/vipFiles/AddVip.vue'], resolve)
+        },
+        {
+          path: '/vipdata/vip',
+          name: '会员信息',
+          component: resolve => require(['../components/page/vipFiles/Vip.vue'], resolve)
+        },
+        {
+          path: '/vipdata/healthdata',
+          name: '健康档案管理',
+          component: resolve => require(['../components/page/vipFiles/HealthData.vue'], resolve)
+        }
+      ]
+
     }
   ]
 })
