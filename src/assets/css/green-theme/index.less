@@ -1,0 +1,51 @@
+@import '~iview/src/styles/index.less';
+
+// Here are the variables to cover
+@primary-color: #0b9595;
+
+.ivu-icon-ios-arrow-down:before {
+    content: "\F217";
+}
+
+.ivu-menu-opened .ivu-icon-ios-arrow-down:before{
+    content: "\F208";
+}
+
+// layout
+*{margin:0;padding:0;}
+html,body,#app,.wrapper{
+    width:100%;
+    height:100%;
+    overflow: hidden;
+}
+body{
+    font: 14px/24px "Helvetica Neue",Helvetica, "microsoft yahei", arial, STHeiTi, sans-serif;
+}
+a{text-decoration: none}
+.content{
+    background: none repeat scroll 0 0 #fff;
+    position: absolute;
+    left: 250px;
+    right: 0;
+    top: 70px;
+    bottom:0;
+    width: auto;
+    padding:40px;
+    box-sizing: border-box;
+    overflow-y: scroll;
+}
+.crumbs{
+    margin-bottom: 20px;
+}
+
+.clearfix{
+    *zoom: 1;
+
+    &:after {
+        content: '';
+        display: table;
+        clear: both;
+        line-height: 0;
+        visibility: hidden;
+    }
+}
