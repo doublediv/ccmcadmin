@@ -8,8 +8,10 @@ import router from './router'
 import iView from 'iview'
 import 'iview/dist/styles/iview.css'
 import './assets/css/green-theme/index.less'
+import layout from "./assets/js/layout.js"
 
 Vue.prototype.$http = axios
+Vue.prototype.$layout = layout
 
 Vue.use(iView)
 

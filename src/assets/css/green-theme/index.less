@@ -3,12 +3,17 @@
 // Here are the variables to cover
 @primary-color: #0b9595;
 
+// 私有化覆盖不了
 .ivu-icon-ios-arrow-down:before {
     content: "\F217";
 }
 
 .ivu-menu-opened .ivu-icon-ios-arrow-down:before{
     content: "\F208";
+}
+
+.sidebar .nav .ivu-menu-submenu-title {
+  padding: 22px 20px;
 }
 
 // layout
@@ -34,18 +39,6 @@ a{
     width: auto;
     box-sizing: border-box;
     overflow-y: scroll;
-
-    .crumbs{
-        font-size: 14px;
-        line-height: 40px;
-        border-bottom: 1px solid #ccc;
-        padding-left: 20px;
-
-        > span:last-child{
-            color: #8a8a8a;
-            font-weight: 400;
-        }
-    }
 
     .router-box{
         padding: 20px;

@@ -1,6 +1,6 @@
 <template>
     <div class="sidebar">
-      <Menu theme="" class="nav" ref="sidebarMenu" :active-name="siActiveName" :open-names="siOpenNames" @on-select="menuSelect" @on-open-change="menuOpen" :accordion="true" width="auto">
+      <Menu class="nav" ref="sidebarMenu" :active-name="siActiveName" :open-names="siOpenNames" @on-select="menuSelect" :accordion="true" width="auto">
         <Submenu v-for="submenu in sidebarNav" :name="submenu.permission_parent_url">
             <template slot="title"><Icon :type="submenu.icon"></Icon>{{ submenu.permission_parent_name }}</template>
             <MenuItem v-for="menuitem in submenu.permission_child" :name="menuitem.permission_child_url">{{ menuitem.permission_child_name }}</MenuItem>
@@ -17,6 +17,20 @@ export default {
       siOpenNames: []
     };
   },
+  created() {
+    if (this.$route.path === "/home") {
+      this.$nextTick(function() {
+        console.log(1);
+        this.siActiveName = "";
+        this.siOpenNames = [];
+        this.$refs.sidebarMenu.updateOpened();
+        this.$refs.sidebarMenu.updateActiveName();
+      });
+    } else {
+      this.siActiveName = this.$route.path;
+      this.siOpenNames = [this.$route.path.match(/\w+/)[0]];
+    }
+  },
   computed: {
     sidebarNav() {
       let sidebarNav = JSON.parse(localStorage.getItem("sidebarnav"));
@@ -24,13 +38,8 @@ export default {
     }
   },
   methods: {
-    // 侧边导航展开
-    menuOpen(arr) {
-      this.siOpenNames = arr
-    },
     // 侧边导航选择
     menuSelect(name) {
-      this.siActiveName = name
       this.$router.push(name);
     }
   }
@@ -53,10 +62,18 @@ export default {
     font-size: 16px;
     background-color: transparent;
 
-    .ivu-menu-item :hover,
+    &:after {
+      width: 0;
+    }
+
     .ivu-menu-opened,
     .ivu-menu-submenu :hover {
       background-color: #097e7e;
+    }
+
+    .ivu-menu-item.ivu-menu-item-selected {
+      border-right: none;
+      background-color: #086868;
     }
 
     .ivu-menu-item {
@@ -68,12 +85,6 @@ export default {
       }
     }
   }
-}
-</style>
-<style lang="less">
-// 私有化覆盖不了
-.sidebar .nav .ivu-menu-submenu-title {
-  padding: 22px 20px;
 }
 </style>
 

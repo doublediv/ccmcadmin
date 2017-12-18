@@ -1,6 +1,6 @@
 <template>
     <div class="header">
-        <div class="logo"><img src="~@/assets/img/login_logo.png" alt="" /></div>
+        <div class="logo" @click="backHome"><img src="~@/assets/img/login_logo.png" alt="" /></div>
         <p class="welcome">你好！欢迎使用CCMC基站管理系统</p>
         <ul class="user-info clearfix">
             <li><Icon type="person"></Icon><span>{{ username }}</span></li>
@@ -22,6 +22,11 @@ export default {
     }
   },
   methods: {
+    // 回首页
+    backHome() {
+      this.$router.push("/home");
+    },
+    // 退出
     signOut() {
       this.isSignOut = true;
       const _this = this;
@@ -59,6 +64,7 @@ export default {
     left: 0;
     width: 250px;
     height: 100%;
+    cursor: pointer;
 
     img {
       display: block;
