@@ -6,7 +6,7 @@ import App from './App'
 import axios from './assets/js/fetch.js'
 import router from './router'
 import iView from 'iview'
-import 'iview/dist/styles/iview.css'
+// import 'iview/dist/styles/iview.css'
 import './assets/css/green-theme/index.less'
 import layout from "./assets/js/layout.js"
 

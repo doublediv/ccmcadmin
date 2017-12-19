@@ -14,35 +14,53 @@ Vue.use(Router)
 export default new Router({
   routes: [
     {
-      path: '/',
+      path: '/login',
       name: '登录',
       component: resolve => require(['../components/page/Login.vue'], resolve)
     },
     {
       path: '/home',
-      name: '主页',
+      name: '首页',
       component: resolve => require(['../components/common/Home.vue'], resolve),
-      // meta: {
-      //     requireAuth: true,  // 添加该字段，表示进入这个路由是需要登录的
-      // }
+
       children: [
+        {
+          path: '/',
+          name: '基站概况',
+          component: resolve => require(['../components/page/Index.vue'], resolve),
+        },
+        // 健康档案管理
         {
           path: '/vipdata/addvip',
           name: '新增会员',
-          component: resolve => require(['../components/page/vipFiles/AddVip.vue'], resolve)
+          component: resolve => require(['../components/page/vipFiles/AddVip.vue'], resolve),
+          meta: { ParentNmame: "会员档案管理" }
         },
         {
           path: '/vipdata/vip',
           name: '会员信息',
-          component: resolve => require(['../components/page/vipFiles/Vip.vue'], resolve)
+          component: resolve => require(['../components/page/vipFiles/Vip.vue'], resolve),
+          meta: { ParentNmame: "会员档案管理" }
         },
         {
           path: '/vipdata/healthdata',
           name: '健康档案管理',
-          component: resolve => require(['../components/page/vipFiles/HealthData.vue'], resolve)
+          component: resolve => require(['../components/page/vipFiles/HealthData.vue'], resolve),
+          meta: { ParentNmame: "会员档案管理" }
+        },
+        // 系统配置
+        {
+          path: '/system/account',
+          name: '帐号管理',
+          component: resolve => require(['../components/page/system/Account.vue'], resolve),
+          meta: { ParentNmame: "系统配置" }
         }
       ]
-
+    },
+    // 路由重定向
+    {
+      path: '/',
+      redirect: '/login'
     }
   ]
 })

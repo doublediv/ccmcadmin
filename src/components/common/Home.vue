@@ -5,7 +5,7 @@
         <div class="content">
             <v-crumb></v-crumb>
             <div class="router-box">
-                <transition name="move" mode="out-in"><router-view></router-view></transition>
+                <transition name="fade" mode="out-in"><router-view></router-view></transition>
             </div>
         </div>
     </div>

@@ -3,28 +3,57 @@
 // Here are the variables to cover
 @primary-color: #0b9595;
 
+.ivu-modal-confirm-head-title{
+    font-size: 18px;
+    font-weight: 400;
+}
+.ivu-modal-confirm-body{
+    font-size: 16px;
+    line-height: 32px;
+}
+
 // 私有化覆盖不了
-.ivu-icon-ios-arrow-down:before {
+.sidebar .nav .ivu-icon-ios-arrow-down:before {
     content: "\F217";
 }
 
-.ivu-menu-opened .ivu-icon-ios-arrow-down:before{
+.sidebar .nav .ivu-menu-opened .ivu-icon-ios-arrow-down:before{
     content: "\F208";
 }
 
 .sidebar .nav .ivu-menu-submenu-title {
-  padding: 22px 20px;
+    padding: 22px 20px;
+}
+
+.eidthform {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .ivu-modal {
+        top: 0;
+
+        .ivu-modal-body{
+            padding: 20px 15px 0;
+        }
+
+        .ivu-modal-header {
+            border-bottom: none;
+            padding: 0;
+        }
+
+        .ivu-modal-footer {
+            border-top: none;
+            padding: 0;
+        }
+    }
 }
 
 // layout
-*{margin:0;padding:0;}
 html,body,#app,.wrapper{
     width:100%;
     height:100%;
     overflow: hidden;
-}
-body{
-    font: 14px/24px "Helvetica Neue",Helvetica, "microsoft yahei", arial, STHeiTi, sans-serif;
 }
 a{
     text-decoration: none
@@ -43,6 +72,10 @@ a{
     .router-box{
         padding: 20px;
     }
+}
+
+.addbutton{
+    margin-bottom: 24px;
 }
 
 .clearfix{

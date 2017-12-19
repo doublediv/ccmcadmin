@@ -17,16 +17,20 @@ export default {
       siOpenNames: []
     };
   },
+  watch: {
+    $route() {
+      if (this.$route.path === "/home") {
+        this.$nextTick(function() {
+          this.siActiveName = "";
+          this.siOpenNames = [];
+          this.$refs.sidebarMenu.updateActiveName();
+          this.$refs.sidebarMenu.updateOpened();
+        });
+      }
+    }
+  },
   created() {
-    if (this.$route.path === "/home") {
-      this.$nextTick(function() {
-        console.log(1);
-        this.siActiveName = "";
-        this.siOpenNames = [];
-        this.$refs.sidebarMenu.updateOpened();
-        this.$refs.sidebarMenu.updateActiveName();
-      });
-    } else {
+    if (this.$route.path !== "/home") {
       this.siActiveName = this.$route.path;
       this.siOpenNames = [this.$route.path.match(/\w+/)[0]];
     }
