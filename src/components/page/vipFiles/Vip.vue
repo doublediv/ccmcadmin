@@ -10,7 +10,7 @@
             <FormItem label="联系方式:">
                 <Input type="text" v-model="searchData.phone" placeholder="按手机号搜索"></Input>
             </FormItem>
-            <Button icon="ios-search" :loading="isSearch" type="primary" @click="search">搜索</Button>
+            <Button class="singlebutton" icon="ios-search" :loading="isSearch" type="primary" @click="search">搜索</Button>
         </Form>
         <v-table ref="vTable" :tableColumns="tableColumns" :tableData="tableData" :totalPage="totalPage" :isPage="isPage" @getPage="selectPage"></v-table>
     </div>
@@ -145,6 +145,7 @@ export default {
     //   搜索
     search() {
       this.isSearch = true;
+      this.isPage = false;
       this.getData("/search_customer", this.searchData);
     },
     // 选页

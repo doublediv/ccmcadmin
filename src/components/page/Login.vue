@@ -25,7 +25,6 @@ export default {
         username: "admin",
         password: "admin"
       },
-      test: [{ a: 1 }, { b: 2 }],
       ruleLogin: {
         username: [{ required: true, message: "请输入帐号" }],
         password: [{ required: true, message: "请输入密码" }]
@@ -42,12 +41,17 @@ export default {
           this.$http
             .post("/login", this.loginData)
             .then(function(res) {
-              // console.log(res);
-              localStorage.setItem("username", res.data.user.userName);
-              localStorage.setItem("sidebarnav", JSON.stringify(res.data.user.permission));
-              _this.$Message.success("登录成功!");
-              _this.isLogin = false;
-              _this.$router.push("/home");
+              console.log(res);
+              if(res.data.status === 2002) {
+                _this.$Notice.error({title: "用户名或密码错误,登录失败!"});
+                _this.isLogin = false;
+              } else {
+                localStorage.setItem("username", res.data.user.userName);
+                localStorage.setItem("sidebarnav", JSON.stringify(res.data.user.permission));
+                _this.$Message.success("登录成功!");
+                _this.isLogin = false;
+                _this.$router.push("/home");
+              }
             })
             .catch(function(err) {
               console.log(err);

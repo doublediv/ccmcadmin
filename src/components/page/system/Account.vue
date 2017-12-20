@@ -13,10 +13,10 @@
                     <Option v-for="item in roleOption" :value="item.id" :key="item.id">{{item.name}}</Option>
                 </Select>
             </FormItem>
-            <Button icon="ios-search" :loading="isSearch" type="primary" @click="search">搜索</Button>
+            <Button class="singlebutton" icon="ios-search" :loading="isSearch" type="primary" @click="search">搜索</Button>
         </Form>
         <Button class="addbutton" icon="plus-round" type="dashed" @click="showAddAccount">新增帐号</Button>
-        <v-table ref="vTable" :tableColumns="tableColumns" :tableData="tableData"></v-table>
+        <v-table ref="vTable" :tableColumns="tableColumns" :tableData="tableData" :isPage="isPage"></v-table>
         <!-- 新增 -->
         <Modal 
             v-model="isAddShow"
@@ -58,6 +58,47 @@
                 <Button type="primary" :loading="isKeep"  @click="addAccount('addAccountForm')">添加</Button>
             </div>
         </Modal>
+        <!-- 修改 -->
+        <Modal 
+            v-model="isEditShow"
+            :closable="false"
+            :mask-closable="false"
+            :width="358"
+            class-name="eidthform">
+            <p slot="header">编辑帐号</p>
+            <Form ref="editAccountForm" :model="editAccountData" :rules="editAccountRules" :label-width="90">
+                <FormItem label="账号:" prop="username">
+                    <Input type="text" v-model="editAccountData.username" placeholder="请输入帐号"></Input>
+                </FormItem>
+                <FormItem label="密码:">
+                    <Input type="password" v-model="editAccountData.password" placeholder="请输入密码"></Input>
+                </FormItem>
+                <FormItem label="确认密码:" prop="repassword">
+                    <Input type="password" v-model="editAccountData.repassword" placeholder="请确认密码"></Input>
+                </FormItem>
+                <FormItem label="使用者姓名:" prop="name">
+                    <Input type="text" v-model="editAccountData.name" placeholder="请输入使用者姓名"></Input>
+                </FormItem>
+                <FormItem label="性别:" prop="gender">
+                    <RadioGroup v-model="editAccountData.gender">
+                        <Radio label="1">男</Radio>
+                        <Radio label="2">女</Radio>
+                    </RadioGroup>
+                </FormItem>
+                <FormItem label="联系电话:" prop="phone">
+                    <Input type="text" v-model="editAccountData.phone" placeholder="请输入联系电话"></Input>
+                </FormItem>
+                <FormItem label="角色:" prop="roleId">
+                    <Select v-model="editAccountData.roleId" placeholder="请选择角色" placement="top" style="width:100%">
+                        <Option v-for="item in roleOption" :value="item.id" :key="item.id">{{item.name}}</Option>
+                    </Select>
+                </FormItem>
+            </Form>
+            <div slot="footer" class="button-box">
+                <Button type="ghost" @click="cancel('editAccountForm', 'isEditShow')">取消</Button>
+                <Button type="primary" :loading="isKeep"  @click="editAccount('editAccountForm')">修改</Button>
+            </div>
+        </Modal>
     </div>
 </template>
 <script>
@@ -65,11 +106,19 @@ import vTable from "../../common/Table.vue";
 export default {
   components: { vTable },
   data() {
-    //   添加帐号规则
+    //   添加帐号确认密码规则
     const rePassWordRule = (rule, value, callback) => {
       if (value === "") {
         callback(new Error("请确认密码"));
       } else if (value !== this.addAccountData.password) {
+        callback(new Error("两次密码输入不一致"));
+      } else {
+        callback();
+      }
+    };
+    //   编辑帐号确认密码规则
+    const editRePassWordRule = (rule, value, callback) => {
+      if (value !== this.editAccountData.password) {
         callback(new Error("两次密码输入不一致"));
       } else {
         callback();
@@ -114,7 +163,15 @@ export default {
                   style: { marginRight: "5px" },
                   on: {
                     click: () => {
-                      this.show(params.index);
+                      this.isEditShow = true;
+                      this.editAccountData = JSON.parse(
+                        JSON.stringify(params.row)
+                      );
+                      if (this.editAccountData.gender === "男") {
+                        this.editAccountData.gender = "1";
+                      } else {
+                        this.editAccountData.gender = "2";
+                      }
                     }
                   }
                 },
@@ -196,6 +253,7 @@ export default {
         }
       ],
       tableData: [],
+      isPage: false,
       isAddShow: false,
       addAccountData: {
         username: "",
@@ -215,7 +273,24 @@ export default {
         phone: [{ required: true, validator: phoneRule }],
         roleId: [{ required: true, message: "请选择角色" }]
       },
-      postUrl: '',
+      isEditShow: false,
+      editAccountData: {
+        username: "",
+        password: "",
+        repassword: "",
+        name: "",
+        gender: "",
+        phone: "",
+        roleId: ""
+      },
+      editAccountRules: {
+        username: [{ required: true, message: "请输入帐号" }],
+        repassword: [{ validator: editRePassWordRule }],
+        name: [{ required: true, message: "请输入使用者姓名" }],
+        gender: [{ required: true, message: "请选择性别" }],
+        phone: [{ required: true, validator: phoneRule }],
+        roleId: [{ required: true, message: "请选择角色" }]
+      },
       isKeep: false
     };
   },
@@ -230,8 +305,11 @@ export default {
       this.$http
         .post("/get_roles")
         .then(function(res) {
-          //   console.log(res);
-          _this.roleOption = res.data.roles;
+          // console.log(res);
+          _this.roleOption = res.data.roles.map(function(e) {
+            e.id = e.id.toString();
+            return e;
+          });
         })
         .catch(function(err) {
           console.log(err);
@@ -244,7 +322,7 @@ export default {
       this.$http
         .post("/get_users", this.searchData)
         .then(function(res) {
-            // console.log(res);
+          // console.log(res);
           //   "status": "99"   9 表示删除  99 表示禁用  0表示正常
           _this.tableData = res.data.user.map(function(e) {
             switch (e.status) {
@@ -281,7 +359,6 @@ export default {
     // 弹出新增账号
     showAddAccount() {
       this.isAddShow = true;
-      this.postUrl = "/add_user"
     },
     // 取消弹窗
     cancel(refName, showName) {
@@ -293,22 +370,24 @@ export default {
       this.$refs[refName].validate(valid => {
         if (valid) {
           this.isKeep = true;
-          var accountDataForAdmin = JSON.parse(JSON.stringify(this.addAccountData));
+          var accountDataForAdmin = JSON.parse(
+            JSON.stringify(this.addAccountData)
+          );
           delete accountDataForAdmin.repassword;
           const _this = this;
           this.$http
-            .post(this.postUrl, accountDataForAdmin)
+            .post("/add_user", accountDataForAdmin)
             .then(function(res) {
               // console.log(res);
               if (res.data.status === 2001) {
                 _this.$Notice.error({ title: "帐号名已存在，添加失败!" });
-                _this.isKeep = false;
               } else {
                 _this.$refs[refName].resetFields();
-                _this.isKeep = false;
                 _this.$Message.success("新增帐号成功!");
+                _this.getUser();
                 _this.isAddShow = false;
               }
+              _this.isKeep = false;
             })
             .catch(function(err) {
               console.log(err);
@@ -317,28 +396,42 @@ export default {
             });
         }
       });
+    },
+    // 修改
+    editAccount(refName) {
+      this.$refs[refName].validate(valid => {
+        if (valid) {
+          this.isKeep = true;
+          const _this = this;
+          this.$http
+            .post("/modify_user", {
+              id: this.addAccountData.id,
+              password: this.addAccountData.password,
+              gender: this.addAccountData.gender,
+              phone: this.addAccountData.phone,
+              roleId: this.addAccountData.roleId,
+              name: this.addAccountData.name,
+              username: this.addAccountData.username
+            })
+            .then(function(res) {
+              // console.log(res);
+              _this.$refs[refName].resetFields();
+              _this.isKeep = false;
+              _this.$Message.success("修改帐号成功!");
+              _this.getUser();
+              _this.isEditShow = false;
+            })
+            .catch(function(err) {
+              console.log(err);
+              _this.isKeep = false;
+              _this.$Notice.error({ title: "修改帐号失败!" });
+            });
+        }
+      });
     }
   }
 };
 </script>
 <style lang="less" scoped>
-.eidthform {
-  .ivu-modal-header p {
-    text-align: center;
-    font-size: 16px;
-    color: #0b9595;
-    font-weight: 400;
-    padding-top: 24px;
-    height: auto;
-  }
 
-  .button-box {
-    text-align: center;
-    padding-bottom: 24px;
-
-    button {
-      margin: 0 4px;
-    }
-  }
-}
 </style>

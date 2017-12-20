@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Table :columns="tableColumns" :data="tableData" :no-data-text="defaultText" border></Table>
+        <Table ref="table" :columns="tableColumns" :data="tableData" :no-data-text="defaultText" border></Table>
         <Page class="page" v-if="isPage" :total="totalPage" :page-size="10" @on-change="changePage"></Page>
     </div>
 </template>
@@ -34,8 +34,6 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.page {
-  margin-top: 10px;
-}
+
 </style>
 

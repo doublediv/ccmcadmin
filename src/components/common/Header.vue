@@ -31,7 +31,7 @@ export default {
       this.isSignOut = true;
       const _this = this;
       this.$http
-        .post("/logout", this.loginData)
+        .post("/logout")
         .then(function(res) {
           // console.log(res);
           localStorage.clear();

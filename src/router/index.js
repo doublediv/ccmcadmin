@@ -54,6 +54,37 @@ export default new Router({
           name: '帐号管理',
           component: resolve => require(['../components/page/system/Account.vue'], resolve),
           meta: { ParentNmame: "系统配置" }
+        },
+        {
+          path: '/system/role',
+          name: '角色管理',
+          component: resolve => require(['../components/page/system/Role.vue'], resolve),
+          meta: { ParentNmame: "系统配置" }
+        },
+        {
+          path: '/system/organization',
+          name: '机构类型管理',
+          component: resolve => require(['../components/page/system/Organization.vue'], resolve),
+          meta: { ParentNmame: "系统配置" }
+        },
+        {
+          path: '/system/viplevel',
+          name: '会员卡级别',
+          component: resolve => require(['../components/page/system/Viplevel.vue'], resolve),
+          meta: { ParentNmame: "系统配置" }
+        },
+        // 财务管理
+        {
+          path: '/finance/rechargerecord',
+          name: '会员卡充值记录',
+          component: resolve => require(['../components/page/finance/Rechargerecord.vue'], resolve),
+          meta: { ParentNmame: "财务管理" }
+        },
+        {
+          path: '/finance/goodsrecord',
+          name: '商品消费记录',
+          component: resolve => require(['../components/page/finance/Goodsrecord.vue'], resolve),
+          meta: { ParentNmame: "财务管理" }
         }
       ]
     },
