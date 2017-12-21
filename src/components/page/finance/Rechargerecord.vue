@@ -12,7 +12,7 @@
                 </Select>
             </FormItem>
             <FormItem label="所属基站:">
-                <Select v-model="searchData.companyId" placeholder="请选择" style="width:164px">
+                <Select v-model="searchData.companyId" placeholder="按所属基站" style="width:164px">
                     <Option value="">请选择</Option>
                 </Select>
             </FormItem>

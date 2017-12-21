@@ -36,12 +36,13 @@ export default {
     signIn(name) {
       this.$refs[name].validate(valid => {
         if (valid) {
+          localStorage.clear();
           this.isLogin = true;
           const _this = this;
           this.$http
             .post("/login", this.loginData)
             .then(function(res) {
-              console.log(res);
+              // console.log(res);
               if(res.data.status === 2002) {
                 _this.$Notice.error({title: "用户名或密码错误,登录失败!"});
                 _this.isLogin = false;

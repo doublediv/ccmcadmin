@@ -28,8 +28,13 @@ axios.interceptors.request.use(config => {
 
 // 添加响应拦截器
 axios.interceptors.response.use(
-    response => response,
-    error => {
+    response => {
+        if (response.data.status === 2005) {
+            localStorage.clear();
+            location.href = "/";
+        }
+        return response
+    }, error => {
         console.log('err' + error);
         return Promise.reject(error);
     });

@@ -124,6 +124,7 @@ export default {
         callback();
       }
     };
+    // 联系方式验证
     const phoneRule = (rule, value, callback) => {
       if (value === "") {
         callback(new Error("请输入联系电话"));

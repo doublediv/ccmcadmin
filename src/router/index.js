@@ -20,7 +20,6 @@ export default new Router({
     },
     {
       path: '/home',
-      name: '首页',
       component: resolve => require(['../components/common/Home.vue'], resolve),
 
       children: [
@@ -85,7 +84,26 @@ export default new Router({
           name: '商品消费记录',
           component: resolve => require(['../components/page/finance/Goodsrecord.vue'], resolve),
           meta: { ParentNmame: "财务管理" }
-        }
+        },
+        {
+          path: '/finance/servicerecord',
+          name: '服务消费记录',
+          component: resolve => require(['../components/page/finance/Servicerecord.vue'], resolve),
+          meta: { ParentNmame: "财务管理" }
+        },
+        // 服务管理
+        {
+          path: '/service/consume',
+          name: '服务消费',
+          component: resolve => require(['../components/page/service/Consume.vue'], resolve),
+          meta: { ParentNmame: "服务管理" }
+        },
+        {
+          path: '/service/addwaiter',
+          name: '新增服务人员',
+          component: resolve => require(['../components/page/service/AddWaiter.vue'], resolve),
+          meta: { ParentNmame: "服务管理" }
+        },
       ]
     },
     // 路由重定向
