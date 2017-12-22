@@ -85,7 +85,7 @@ export default {
         })
         .catch(function(err) {
           console.log(err);
-          _this.defaultText = "暂无数据"
+          _this.defaultText = "数据获取失败"
           _this.$Notice.error({ title: "会员卡充值记录获取失败！" });
           if (_this.isSearch) {
             _this.isSearch = false;

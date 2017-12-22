@@ -104,6 +104,31 @@ export default new Router({
           component: resolve => require(['../components/page/service/AddWaiter.vue'], resolve),
           meta: { ParentNmame: "服务管理" }
         },
+        {
+          path: '/service/type',
+          name: '服务类型管理',
+          component: resolve => require(['../components/page/service/Type.vue'], resolve),
+          meta: { ParentNmame: "服务管理" }
+        },
+        {
+          path: '/service/facilitator',
+          name: '服务商管理',
+          component: resolve => require(['../components/page/service/Facilitator.vue'], resolve),
+          meta: { ParentNmame: "服务管理" }
+        },
+        // 商品管理
+        {
+          path: '/goods/type',
+          name: '商品类别管理',
+          component: resolve => require(['../components/page/goods/Type.vue'], resolve),
+          meta: { ParentNmame: "商品管理" }
+        },
+        {
+          path: '/goods/addname',
+          name: '新增商品名录',
+          component: resolve => require(['../components/page/goods/AddName.vue'], resolve),
+          meta: { ParentNmame: "商品管理" }
+        },
       ]
     },
     // 路由重定向

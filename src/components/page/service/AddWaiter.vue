@@ -25,10 +25,7 @@
                 <Option v-for="item in serviceItem" :value="item.id" :key="item.id">{{ item.name }}</Option>
             </Select>
         </FormItem>
-        <!-- <Upload action="http://192.168.1.149:8080/ccmc/upload_avatar">
-            <Button type="ghost" icon="ios-cloud-upload-outline">Upload files</Button>
-        </Upload> -->
-        <upload-pic></upload-pic>
+        <upload-pic :fileType="fileType" @upSuccess="setPicUrl"></upload-pic>
         <div class="buttonbox">
             <Button type="ghost" @click="resetWaiter('addWaiterForm')">重置</Button>
             <Button :loading="isKeep" type="primary" @click="addWaiter('addWaiterForm')">提交</Button>
@@ -37,17 +34,30 @@
   </div>
 </template>
 <script>
-import uploadPic from "../../common/UploadPic.vue"
+import uploadPic from "../../common/UploadPic.vue";
 export default {
   components: { uploadPic },
   data() {
     // 联系方式验证
     const phoneRule = (rule, value, callback) => {
+      //   支持手机号码，3-4位区号，7-8位直播号码
+      let phoneReg = /((^\d{11}$)|(^(\d{3,4}-)?\d{7,8}$))/;
       if (value === "") {
         callback(new Error("请输入联系电话"));
-      } else if (!/((^\d{11}$)|(^(\d{3,4}-)?\d{7,8}$))/.test(value)) {
-        //   支持手机号码，3-4位区号，7-8位直播号码
+      } else if (!phoneReg.test(value)) {
         callback(new Error("请输入正确的联系电话"));
+      } else {
+        callback();
+      }
+    };
+    // 身份证验证
+    const idCardRule = (rule, value, callback) => {
+      //   15/17+加校验码
+      let idCardReg = /(^\d{15}$)|(^\d{17}(\d|X|x)$)/;
+      if (value === "") {
+        callback(new Error("请输入身份证号"));
+      } else if (!idCardReg.test(value)) {
+        callback(new Error("请输入正确的身份证号"));
       } else {
         callback();
       }
@@ -69,9 +79,12 @@ export default {
       addWaiterRule: {
         name: [{ required: true, message: "请输入姓名" }],
         tel: [{ required: true, validator: phoneRule }],
-        idCard: [{ required: true, validator: phoneRule }],
+        idCard: [{ required: true, validator: idCardRule }],
         address: [{ required: true, message: "请输入住址" }],
         serviceProjectId: [{ required: true, message: "请选服务项目" }]
+      },
+      fileType: {
+        fileType: 2
       },
 
       isKeep: false
@@ -113,6 +126,11 @@ export default {
         });
     },
 
+    // 获取上传图片的地址
+    setPicUrl(imgUrl) {
+      this.addWaiterData.picUrl = imgUrl;
+    },
+
     // 重置表单
     resetWaiter(refName) {
       this.$refs[refName].resetFields();
@@ -122,12 +140,13 @@ export default {
       this.$refs[refName].validate(valid => {
         if (valid) {
           this.isKeep = true;
+          // console.log(this.addWaiterData)
           this.$http
             .post("/add_service_user", this.addWaiterData)
             .then(res => {
               // console.log(res);
               this.isKeep = false;
-              // this.$refs[refName].resetFields();
+              this.$refs[refName].resetFields();
               this.$Message.success("新增服务人员成功！");
             })
             .catch(err => {

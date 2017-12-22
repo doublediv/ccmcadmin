@@ -19,7 +19,7 @@ export default {
   mounted() {
     this.$nextTick(() => {
       this.$on("getErr", () => {
-        this.defaultText = "暂无数据";
+        this.defaultText = "数据获取失败";
       });
     });
   },

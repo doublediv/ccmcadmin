@@ -236,11 +236,11 @@ export default {
                             .then(function(res) {
                               _this.$Modal.remove();
                               _this.tableData.splice(params.index, 1);
-                              _this.$Message.success("会员删除成功!");
+                              _this.$Message.success("帐号删除成功!");
                             })
                             .catch(function(err) {
                               console.log(err);
-                              _this.$Notice.error({ title: "会员删除失败！" });
+                              _this.$Notice.error({ title: "帐号删除失败！" });
                             });
                         }
                       });

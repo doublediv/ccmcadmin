@@ -1,5 +1,6 @@
 <template>
     <div>
+        <slot>上传证件照</slot>
         <div class="samll-img">
             <div v-show="havePic" class="picbox">
                 <Avatar class="avatarPic" icon="person" shape="square" :src="picUrl" />
@@ -24,25 +25,27 @@
                 :on-exceeded-size="uploadMaxSize"
                 :on-error="uploadError"
                 :on-success="uploadSuccess"
-                :data ="{fileType: 2}"
+                :data="fileType"
                 action="http://192.168.1.149:8080/ccmc/upload_avatar">
                 <Icon type="camera" size="20"></Icon>
             </Upload>
         </div>
         <Modal class-name="bigPic" width="360" title="查看图片" v-model="isView">
-            <img :src="isUplod" alt="" />
+            <img :src="picUrl" alt="" />
         </Modal>
     </div>
 </template>
 <script>
 export default {
+  props: ["fileType"],
   data() {
     return {
       picUrl: "",
       havePic: false,
       isSpin: false,
       isUplod: true,
-      isView: false
+      isView: false,
+      uploadType: 2
     };
   },
   methods: {
@@ -78,16 +81,23 @@ export default {
     uploadError(err) {
       this.isSpin = false;
       this.isUplod = true;
-      this.$Notice.warning({
+      this.$Notice.error({
         title: "上传结果",
         desc: "图片上传失败！"
       });
     },
     uploadSuccess(res, file) {
-      this.isSpin = false;
-      this.havePic = true;
-      this.picUrl = "http://fanyi.baidu.com/static/translation/img/header/logo_cbfea26.png";
+      
+      let img = new Image();
+      img.onload = () => {
+        this.isSpin = false;
+        this.havePic = true;
+        this.picUrl = img.src;
+        this.$emit("upSuccess", res.avatar_path);
+      };
+      img.src = "http://192.168.1.149:8080" + res.avatar_path;
     }
+    
   }
 };
 </script>
@@ -96,7 +106,7 @@ export default {
   position: relative;
   width: 58px;
   height: 58px;
-  margin-bottom: 24px;
+  margin: 10px 0 24px;
 
   .picbox {
     width: 100%;

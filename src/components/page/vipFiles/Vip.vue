@@ -30,7 +30,6 @@ export default {
         page: 0
       },
       isSearch: false,
-
       tableColumns: [
         { type: "index", align: "center", width: "60" },
         { title: "姓名", key: "name", align: "center" },
@@ -66,21 +65,33 @@ export default {
                   props: { type: "error", size: "small" },
                   on: {
                     click: () => {
-                      // this.tableData.splice(params.index, 1);
-                      //   console.log(params.row);
-                      const _this = this;
-                      this.$http
-                        .post("/remove_customer", {
-                          customerId: params.row.customerId
-                        })
-                        .then(function(res) {
-                          _this.tableData.splice(params.index, 1);
-                          _this.$Message.success("删除成功!");
-                        })
-                        .catch(function(err) {
-                          console.log(err);
-                          _this.$Notice.error({ title: "删除失败！" });
-                        });
+                      this.$Modal.confirm({
+                        title: "删除确认",
+                        content: `<p>姓名：${params.row.name}</p>
+                                 <p>会员手机：${params.row.phone}</p>
+                                 <p>会员卡号：${params.row.vipcard}</p>
+                                 <p>所属基站：${params.row.companyName}</p>`,
+                        okText: "确认",
+                        cancelText: "取消",
+                        loading: true,
+                        onOk: () => {
+                          const _this = this;
+                          this.$http
+                            .post("/remove_customer", {
+                              customerId: params.row.customerId
+                            })
+                            .then(function(res) {
+                              _this.$Modal.remove();
+                              _this.tableData.splice(params.index, 1);
+                              _this.$Message.success("会员删除成功!");
+                              _this.getData("/getcustomer", { limit: 10, page: 1 });
+                            })
+                            .catch(function(err) {
+                              console.log(err);
+                              _this.$Notice.error({ title: "会员删除失败！" });
+                            });
+                        }
+                      });
                     }
                   }
                 },
@@ -129,16 +140,16 @@ export default {
           } else {
             _this.isPage = false;
           }
-          if(_this.isSearch) {
-              _this.isSearch = false
+          if (_this.isSearch) {
+            _this.isSearch = false;
           }
         })
         .catch(function(err) {
           console.log(err);
           _this.$refs.vTable.$emit("getErr");
           _this.$Notice.error({ title: "会员信息获取失败！" });
-          if(_this.isSearch) {
-              _this.isSearch = false
+          if (_this.isSearch) {
+            _this.isSearch = false;
           }
         });
     },
