@@ -9,8 +9,9 @@
         </FormItem>
         <Button class="singlebutton" icon="ios-search" :loading="isSearch" type="primary" @click="search">搜索</Button>
     </Form>
-    <Button class="addbutton" icon="plus-round" type="dashed" @click="showPopup('isAdd')">新增服务商</Button> <Button class="singlebutton"  type="primary" @click="exportData"><Icon type="ios-download-outline"></Icon> 导出数据</Button>
-    <Table ref="vTable" :columns="tableColumns" :data="tableData" :no-data-text="defaultText" border></Table>
+    <Button class="addbutton" icon="plus-round" type="dashed" @click="showPopup('isAdd')">新增服务商</Button> 
+    <Button class="singlebutton"  type="primary" @click="exportData"><Icon type="ios-download-outline"></Icon> 导出数据</Button>
+    <Table ref="table" :columns="tableColumns" :data="tableData" :no-data-text="defaultText" border></Table>
     <Page class="page" v-if="isPage" :total="totalPage" :page-size="10" @on-change="changePage"></Page>
     <!-- 新增服务商 -->
     <Modal 
@@ -214,6 +215,7 @@ export default {
     },
     //   获取数据
     getData(jsonData) {
+      this.tableData = [];
       this.$http
         .post("/service_business_list", jsonData)
         .then(res => {
@@ -258,6 +260,9 @@ export default {
     // 搜索
     search() {
       this.isSearch = true;
+      if (this.isPage) {
+        this.isPage = false;
+      }
       this.getData(this.searchData);
     },
     // 选页

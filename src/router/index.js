@@ -129,6 +129,31 @@ export default new Router({
           component: resolve => require(['../components/page/goods/AddName.vue'], resolve),
           meta: { ParentNmame: "商品管理" }
         },
+        {
+          path: '/goods/library',
+          name: '商品库',
+          component: resolve => require(['../components/page/goods/Library.vue'], resolve),
+          meta: { ParentNmame: "商品管理" }
+        },
+        {
+          path: '/goods/addgoods',
+          name: '商品入库',
+          component: resolve => require(['../components/page/goods/Addgoods.vue'], resolve),
+          meta: { ParentNmame: "商品管理" }
+        },
+        {
+          path: '/goods/inventory',
+          name: '库存列表',
+          component: resolve => require(['../components/page/goods/Inventory.vue'], resolve),
+          meta: { ParentNmame: "商品管理" }
+        },
+        // 会员账户管理
+        {
+          path: '/vipaccount/recharge',
+          name: '会员卡充值',
+          component: resolve => require(['../components/page/vipaccount/Recharge.vue'], resolve),
+          meta: { ParentNmame: "会员账户管理" }
+        },
       ]
     },
     // 路由重定向

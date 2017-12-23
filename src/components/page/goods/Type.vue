@@ -50,6 +50,32 @@
             <Button type="primary" :loading="isKeep"  @click="addGoodsTwo('addGoodsTwoForm')">保存</Button>
         </div>
     </Modal> 
+    <!-- 编辑二级类目 -->
+    <Modal 
+        v-model="isEditTwo"
+        :closable="false"
+        :mask-closable="false"
+        :width="358"
+        class-name="eidthform">
+        <p slot="header">编辑二级类目</p>
+        <Form ref="editGoodsTwoForm" :model="editGoodsTwoData" :rules="editGoodsTwoRules" :label-width="80">
+            <FormItem label="一级类目:" prop="oneCategoryId">
+                <Select v-model="editGoodsTwoData.oneCategoryId" placeholder="请选择一级类目名称" style="width:100%">
+                    <Option v-for="item in goodsOne" :value="item.id" :key="item.id">{{ item.name }}</Option>
+                </Select>
+            </FormItem>
+            <FormItem label="二级类目:" prop="twoCategoryName">
+                <Input type="text" v-model="editGoodsTwoData.twoCategoryName" placeholder="请输入二级类目名称"></Input>
+            </FormItem>
+            <FormItem label="排序:">
+                <Input type="text" v-model="editGoodsTwoData.seqNo" placeholder="请输入排序"></Input>
+            </FormItem>
+        </Form>
+        <div slot="footer" class="button-box">
+            <Button type="ghost" @click="cancel('editGoodsTwoForm', 'isEditTwo')">取消</Button>
+            <Button type="primary" :loading="isKeep"  @click="editGoodsTwo('editGoodsTwoForm')">保存</Button>
+        </div>
+    </Modal> 
   </div>
 </template>
 <script>
@@ -79,6 +105,15 @@ export default {
         fatherProductCategoryId: [{ required: true, message: "请选择一级类目名称" }],
         name: [{ required: true, message: "请输入二级类目名称" }]
       },
+      editGoodsTwoData: {
+        oneCategoryId: "",
+        twoCategoryName: "",
+        seqNo: "100"
+      },
+      editGoodsTwoRules: {
+        oneCategoryId: [{ required: true, message: "请选择一级类目名称" }],
+        twoCategoryName: [{ required: true, message: "请输入二级类目名称" }]
+      },
       tableColumns: [
         { type: "index", align: "center", width: "60" },
         { title: "一级类目名称", key: "oneCategoryName", align: "center" },
@@ -99,7 +134,9 @@ export default {
                     click: () => {
                       // console.log(params.row);
                       this.isEditTwo = true;
-                      this.editTwoData = JSON.parse(JSON.stringify(params.row));
+                      this.editGoodsTwoData = JSON.parse(
+                        JSON.stringify(params.row)
+                      );
                     }
                   }
                 },
@@ -201,6 +238,41 @@ export default {
               this.isKeep = false;
               console.log(err);
               this.$Notice.error({ title: "添加二级类目失败！" });
+            });
+        }
+      });
+    },
+    // 编辑二级类目
+    editGoodsTwo(refName) {
+      this.$refs[refName].validate(valid => {
+        if (valid) {
+          this.isKeep = true;
+          console.log( [
+              { id: this.editGoodsTwoData.twoCategoryId },
+              {
+                name: this.editGoodsTwoData.twoCategoryName,
+                seqNo: this.editGoodsTwoData.seqNo
+              }
+            ])
+          this.$http
+            .post("/modify_product_category", [
+              { id: this.editGoodsTwoData.twoCategoryId },
+              {
+                name: this.editGoodsTwoData.twoCategoryName,
+                seqNo: this.editGoodsTwoData.seqNo
+              }
+            ])
+            .then(res => {
+              this.isKeep = false;
+              this.isAddTwo = false;
+              this.$refs[refName].resetFields();
+              this.$Message.success("编辑二级类目成功!");
+              this.getData();
+            })
+            .catch(err => {
+              this.isKeep = false;
+              console.log(err);
+              this.$Notice.error({ title: "编辑二级类目失败！" });
             });
         }
       });
