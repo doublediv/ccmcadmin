@@ -118,7 +118,7 @@ export default {
       this.$http
         .post(url, jsonData)
         .then(function(res) {
-          // console.log(res)
+          console.log(res)
           _this.tableData = res.data.customers.map(function(e) {
             switch (e.gender) {
               case 1:

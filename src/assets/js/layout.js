@@ -35,7 +35,7 @@ obj.onResult(function (rData) {
             localStorage.setItem("vipnumber", JSON.stringify(strcard))
         } else {
             // console.log('Found no card');
-            alert("读卡失败，请放好卡片！")
+            alert("读卡失败，请链接设备，放好卡片！")
         }
     }
 });

@@ -1,7 +1,7 @@
 <template>
   <div class="consume-box">
     <p class="title">会员卡充值</p>
-    <Form :model="searchData" inline :label-width="70">
+    <Form :model="searchData" inline :label-width="80">
         <FormItem label="会员搜索:">
             <Input type="text" v-model="searchData.content" placeholder="请读取卡号或输入手机号"></Input>
         </FormItem>
@@ -12,31 +12,31 @@
     <p class="tip">会员信息</p>
     <Form :model="vipData" inline :label-width="82">
         <FormItem label="姓名:">
-            <Input disabled type="text" v-model="vipData.realName" placeholder="请读取卡号或输入手机号"></Input>
+            <Input disabled type="text" v-model="vipData.realName" placeholder="请先搜索相关会员"></Input>
         </FormItem>
         <FormItem label="性别:">
-            <Input disabled type="text" v-model="vipData.gender" placeholder="请读取卡号或输入手机号"></Input>
+            <Input disabled type="text" v-model="vipData.gender" placeholder="请先搜索相关会员"></Input>
         </FormItem>
         <FormItem label="身份证:">
-            <Input disabled type="text" v-model="vipData.idcard" placeholder="请读取卡号或输入手机号"></Input>
+            <Input disabled type="text" v-model="vipData.idcard" placeholder="请先搜索相关会员"></Input>
         </FormItem>
         <FormItem label="会员卡号:">
-            <Input disabled type="text" v-model="vipData.vipcard" placeholder="请读取卡号或输入手机号"></Input>
+            <Input disabled type="text" v-model="vipData.vipcard" placeholder="请先搜索相关会员"></Input>
         </FormItem>
         <FormItem label="联系电话:">
-            <Input disabled type="text" v-model="vipData.tel" placeholder="请读取卡号或输入手机号"></Input>
+            <Input disabled type="text" v-model="vipData.tel" placeholder="请先搜索相关会员"></Input>
         </FormItem>
         <FormItem label="所属基站:">
-            <Input disabled type="text" v-model="vipData.companyName" placeholder="请读取卡号或输入手机号"></Input>
+            <Input disabled type="text" v-model="vipData.companyName" placeholder="请先搜索相关会员"></Input>
         </FormItem>
     </Form>
     <p class="tip">充值信息</p>
-    <Form ref="rechargeForm" :model="rechargeData" :rules="rechargeRule" inline :label-width="82">
+    <Form ref="rechargeForm" :model="rechargeData" :rules="rechargeRule" inline :label-width="80">
         <FormItem label="操作员:">
-            <Input disabled type="text" v-model="rechargeData.operator" placeholder="请读取卡号或输入手机号"></Input>
+            <Input disabled type="text" v-model="rechargeData.operator" placeholder="请先搜索相关会员"></Input>
         </FormItem>
         <FormItem label="账户余额:">
-            <Input disabled type="text" v-model="rechargeData.totalDeposits" placeholder="请读取卡号或输入手机号"></Input>
+            <Input disabled type="text" v-model="rechargeData.totalDeposits" placeholder="请先搜索相关会员"></Input>
         </FormItem>
         <FormItem label="充值金额:" prop="amount">
             <Input type="text" v-model="rechargeData.amount" placeholder="请输入充值金额"></Input>
@@ -114,6 +114,9 @@ export default {
           switch (res.data.status) {
             case 3001:
               this.$Notice.error({ title: "会员卡号不存在" });
+              for(var key in this.vipData) {
+                this.vipData[key] = ""
+              }
               break;
             case 3002:
               this.$Notice.error({ title: "会员卡号已被挂失" });
@@ -192,7 +195,7 @@ export default {
 </script>
 <style lang="less" scoped>
 .consume-box {
-  width: 580px;
+  width: 590px;
   margin: 24px auto 0;
   border: 1px solid #ccc;
   border-radius: 5px;

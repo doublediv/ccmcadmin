@@ -4,20 +4,19 @@
             <FormItem label="会员姓名:">
                 <Input v-model="searchData.realName" placeholder="按会员姓名搜索"></Input>
             </FormItem>
-            <FormItem label="付款方式:">
-                <Select v-model="searchData.paidType" placeholder="按付款方式搜索" style="width:164px">
+            <FormItem label="会员状态:">
+                <Select v-model="searchData.status" placeholder="按会员状态搜索" style="width:164px">
                     <Option value="">请选择</Option>
-                    <Option value="0">现金</Option>
-                    <Option value="1">刷卡</Option>
+                    <Option value="0">正常</Option>
+                    <Option value="99">已禁用/挂失</Option>
+                    <Option value="9">注销</Option>
                 </Select>
             </FormItem>
-            <FormItem label="所属基站:">
-                <Select v-model="searchData.companyId" placeholder="按所属基站搜索" style="width:164px">
-                    <Option value="">请选择</Option>
-                </Select>
+            <FormItem label="会员手机:">
+                <Input v-model="searchData.tel" placeholder="按会员手机搜索"></Input>
             </FormItem>
-            <FormItem label="充值时间:">
-                <DatePicker @on-change="setSearchDate" type="daterange" placement="bottom-end" placeholder="按充值时间搜索" style="width: 200px"></DatePicker>
+            <FormItem label="建档时间:">
+                <DatePicker @on-change="setSearchDate" type="daterange" placement="bottom-end" placeholder="按建档时间搜索" style="width: 200px"></DatePicker>
             </FormItem>
             <Button class="singlebutton" icon="ios-search" :loading="isSearch" type="primary" @click="search">搜索</Button>
         </Form>
@@ -32,10 +31,10 @@ export default {
     return {
       searchData: {
         realName: "",
-        paidType: "",
+        tel: "",
+        status: "",
         startTime: "",
         endTime: "",
-        companyId: "",
         limit: 10,
         page: 0
       },
@@ -43,15 +42,16 @@ export default {
       tableColumns: [
         { type: "index", align: "center", width: "60" },
         { title: "姓名", key: "realName", align: "center" },
-        { title: "会员卡号", key: "vipCard", align: "center" },
+        { title: "性别", key: "gender", align: "center" },
+        { title: "会员卡号", key: "vipcard", align: "center" },
+        { title: "会员手机", key: "tel", align: "center" },
         { title: "所属基站", key: "companyName", align: "center" },
-        { title: "充值前余额", key: "beforeQuota", align: "center" },
-        { title: "充值金额", key: "rechargeQuota", align: "center" },
-        { title: "充值后余额", key: "afterQuota", align: "center" },
-        { title: "充值时间", key: "paidTime", align: "center" },
-        { title: "付款方式", key: "paidType", align: "center" },
-        { title: "销售人员", key: "seller", align: "center" },
-        { title: "会员卡状态", key: "vipCardStatus", align: "center" }
+        { title: "建档时间", key: "createTime", align: "center" },
+        { title: "充值次数", key: "chargeCount", align: "center" },
+        { title: "总充值金额", key: "allChargeQuota", align: "center" },
+        { title: "当前余额", key: "totalDeposits", align: "center" },
+        { title: "积分", key: "score", align: "center" },
+        { title: "会员卡状态", key: "vipcardStatus", align: "center" }
       ],
       tableData: [],
       defaultText: "加载中...",
@@ -68,10 +68,10 @@ export default {
       const _this = this;
       this.tableData = [];
       this.$http
-        .post("/VIP_card_recharge_list", jsonData)
+        .post("/VIP_card_base_list", jsonData)
         .then(function(res) {
-          //   console.log(res);
-          _this.tableData = res.data.record;
+            // console.log(res);
+          _this.tableData = res.data.customers;
           //   分页
           _this.totalPage = res.data.paginator.totalCount;
           if (res.data.paginator.totalPages > 1) {
@@ -86,7 +86,7 @@ export default {
         .catch(function(err) {
           console.log(err);
           _this.defaultText = "数据获取失败"
-          _this.$Notice.error({ title: "会员卡充值记录获取失败！" });
+          _this.$Notice.error({ title: "会员账户列表获取失败！" });
           if (_this.isSearch) {
             _this.isSearch = false;
           }
@@ -109,7 +109,7 @@ export default {
     },
     // 导出数据
     exportData() {
-      this.$refs.table.exportCsv({filename: "会员卡充值记录"})
+      this.$refs.table.exportCsv({filename: "会员账户列表"})
     }
   }
 };

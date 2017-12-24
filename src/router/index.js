@@ -154,6 +154,37 @@ export default new Router({
           component: resolve => require(['../components/page/vipaccount/Recharge.vue'], resolve),
           meta: { ParentNmame: "会员账户管理" }
         },
+        {
+          path: '/vipaccount/change',
+          name: '会员卡变更',
+          component: resolve => require(['../components/page/vipaccount/Change.vue'], resolve),
+          meta: { ParentNmame: "会员账户管理" }
+        },
+        {
+          path: '/vipaccount/consume',
+          name: '会员卡消费',
+          component: resolve => require(['../components/page/vipaccount/Consume.vue'], resolve),
+          meta: { ParentNmame: "会员账户管理" }
+        },
+        {
+          path: '/vipaccount/viplist',
+          name: '会员账户列表',
+          component: resolve => require(['../components/page/vipaccount/Viplist.vue'], resolve),
+          meta: { ParentNmame: "会员账户管理" }
+        },
+        // 积分管理
+        {
+          path: '/integral/exchangerecord',
+          name: '兑换记录',
+          component: resolve => require(['../components/page/integral/Exchangerecord.vue'], resolve),
+          meta: { ParentNmame: "积分管理" }
+        },
+        {
+          path: '/integral/exchange',
+          name: '积分兑换',
+          component: resolve => require(['../components/page/integral/Exchange.vue'], resolve),
+          meta: { ParentNmame: "积分管理" }
+        }
       ]
     },
     // 路由重定向

@@ -58,7 +58,7 @@ export default {
       this.$http
         .post("/product_order_list", jsonData)
         .then(function(res) {
-          console.log(res);
+          // console.log(res);
           _this.tableData = res.data.product_record;
           //   分页
           _this.totalPage = res.data.paginator.totalCount;
