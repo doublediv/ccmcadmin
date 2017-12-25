@@ -53,7 +53,8 @@ export default {
                   style: { marginRight: "5px" },
                   on: {
                     click: () => {
-                      this.show(params.index);
+                      // console.log(params.row)
+                      this.$router.push("/vipdata/vip/edit/" + params.row.customerId);
                     }
                   }
                 },
@@ -108,7 +109,7 @@ export default {
   },
   created() {
     //   初始数据
-    this.getData("/getcustomer", { limit: 10, page: 1 });
+    this.getData("/getcustomer", { limit: 10, page: 0 });
   },
   methods: {
     // 获取数据
@@ -118,7 +119,7 @@ export default {
       this.$http
         .post(url, jsonData)
         .then(function(res) {
-          console.log(res)
+          // console.log(res)
           _this.tableData = res.data.customers.map(function(e) {
             switch (e.gender) {
               case 1:

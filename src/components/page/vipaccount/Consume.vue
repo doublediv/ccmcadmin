@@ -37,23 +37,31 @@
         <Table ref="addTable" :columns="addGoodsColumns" :data="addGoodsData" height="400" border></Table>
         <p class="tip">&nbsp;</p>
         <p class="tip">订单信息</p>
-        <Form ref="orderForm" :model="orderData" :rules="orderRule" inline :label-width="90">
-            <FormItem label="消费总金额:">
-                <Input disabled type="text" v-model="orderData.totalConsumption"></Input>
-            </FormItem>
-            <FormItem label="折后总金额:">
-                <Input disabled type="text" v-model="orderData.afterDiscount"></Input>
-            </FormItem>
-            <FormItem label="所得积分总额:">
-                <Input disabled type="text" v-model="orderData.afterDiscount"></Input>
-            </FormItem>
-            <FormItem label="销售人员:" prop="seller">
-                <Input type="text" v-model="orderData.seller" placeholder="请输入销售人员"></Input>
-            </FormItem>
-            <FormItem>
-                <Button class="singlebutton" :loading="isKeep" type="primary" @click="buyGoods('orderForm')">确定购买</Button>
-                <Button class="singlebutton" type="ghost" @click="cancelBuy">取消购买</Button>
-            </FormItem>
+        <Form :model="orderData" inline :label-width="90">
+            <Row>
+              <Col span="24">
+                <FormItem label="消费总金额:">
+                    <Input disabled type="text" v-model="orderData.totalConsumption"></Input>
+                </FormItem>
+                <FormItem label="折后总金额:">
+                    <Input disabled type="text" v-model="orderData.afterDiscount"></Input>
+                </FormItem>
+              </Col>
+              <Col span="24">
+                <FormItem label="所得积分总额:">
+                    <Input disabled type="text" v-model="orderData.afterDiscount"></Input>
+                </FormItem>
+                <FormItem label="销售人员:">
+                    <Input type="text" v-model="orderData.seller" placeholder="请输入销售人员"></Input>
+                </FormItem>
+              </Col>
+              <Col span="24">
+                <FormItem>
+                    <Button class="singlebutton" :loading="isKeep" type="primary" @click="buyGoods">确定购买</Button>
+                    <Button class="singlebutton" type="ghost" @click="cancelBuy">取消购买</Button>
+                </FormItem>
+              </Col>
+            </Row>
         </Form>
     </Col>
   </Row>
@@ -221,9 +229,6 @@ export default {
         totalConsumption: 0,
         afterDiscount: 0,
         seller: ""
-      },
-      orderRule: {
-        seller: [{ required: true, message: "请输入销售人员" }]
       },
       isKeep: false
     };
@@ -396,46 +401,42 @@ export default {
       this.orderData.afterDiscount = 0;
     },
     // 确定购买
-    buyGoods(refName) {
-      this.$refs[refName].validate(valid => {
-        if (valid) {
-          if (this.orderData.afterDiscount > this.vipData.totalDeposits) {
-            this.$Modal.warning({
-              title: "兑换信息",
-              content: "<p>该用户余额不足！</p>"
-            });
-          } else {
-            //   console.log(this.addGoodsData);
+    buyGoods() {
+      if (this.orderData.afterDiscount > this.vipData.totalDeposits) {
+        this.$Modal.warning({
+          title: "兑换信息",
+          content: "<p>该用户余额不足！</p>"
+        });
+      } else {
+        //   console.log(this.addGoodsData);
 
-            var orderDataForAdmin = this.addGoodsData.map(e => {
-              return {
-                customerId: this.vipData.customerId,
-                productId: e.productId,
-                quantity: e.count,
-                seller: this.orderData.seller
-              };
-            });
+        var orderDataForAdmin = this.addGoodsData.map(e => {
+          return {
+            customerId: this.vipData.customerId,
+            productId: e.productId,
+            quantity: e.count,
+            seller: this.orderData.seller
+          };
+        });
 
-            //   console.log(orderDataForAdmin);
-            this.isKeep = true;
-            this.$http
-              .post("/add_product_order", orderDataForAdmin)
-              .then(res => {
-                this.getData(this.searchData);
-                this.addGoodsData = [];
-                this.orderData.totalConsumption = 0;
-                this.orderData.afterDiscount = 0;
-                this.isKeep = false;
-                this.$Message.success("订单提交成功！");
-              })
-              .catch(err => {
-                console.log(err);
-                this.isKeep = false;
-                this.$Notice.error({ title: "订单提交失败！" });
-              });
-          }
-        }
-      });
+        //   console.log(orderDataForAdmin);
+        this.isKeep = true;
+        this.$http
+          .post("/add_product_order", orderDataForAdmin)
+          .then(res => {
+            this.getData(this.searchData);
+            this.addGoodsData = [];
+            this.orderData.totalConsumption = 0;
+            this.orderData.afterDiscount = 0;
+            this.isKeep = false;
+            this.$Message.success("订单提交成功！");
+          })
+          .catch(err => {
+            console.log(err);
+            this.isKeep = false;
+            this.$Notice.error({ title: "订单提交失败！" });
+          });
+      }
     }
   }
 };

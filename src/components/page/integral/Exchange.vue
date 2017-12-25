@@ -67,17 +67,23 @@
         <Table ref="addServiceTable" :columns="addServiceColumns" :data="addServiceData" height="250" border></Table>
         <p class="tip">&nbsp;</p>
         <p class="tip">订单信息</p>
-        <Form ref="orderForm" :model="orderData" :rules="orderRule" inline :label-width="90">
-            <FormItem label="消费总积分:">
-                <Input disabled type="text" v-model="orderData.totalConsumption"></Input>
-            </FormItem>
-            <FormItem label="销售人员:" prop="seller">
-                <Input type="text" v-model="orderData.seller" placeholder="请输入销售人员"></Input>
-            </FormItem>
-            <FormItem>
-                <Button class="singlebutton" :loading="isKeep" type="primary" @click="buyGoods('orderForm')">确定兑换</Button>
-                <Button class="singlebutton" type="ghost" @click="cancelBuy">取消兑换</Button>
-            </FormItem>
+        <Form :model="orderData" inline :label-width="90">
+          <Row>
+            <Col span="24">
+              <FormItem label="消费总积分:">
+                  <Input disabled type="text" v-model="orderData.totalConsumption"></Input>
+              </FormItem>
+              <FormItem label="销售人员:">
+                  <Input type="text" v-model="orderData.seller" placeholder="请输入销售人员"></Input>
+              </FormItem>
+            </Col>
+            <Col span="24">
+              <FormItem>
+                  <Button class="singlebutton" :loading="isKeep" type="primary" @click="buyGoods">确定兑换</Button>
+                  <Button class="singlebutton" type="ghost" @click="cancelBuy">取消兑换</Button>
+              </FormItem>
+            </Col>
+          </Row>
         </Form>
     </Col>
   </Row>
@@ -359,9 +365,6 @@ export default {
       orderData: {
         totalConsumption: 0,
         seller: ""
-      },
-      orderRule: {
-        seller: [{ required: true, message: "请输入销售人员" }]
       },
       isKeep: false
     };
@@ -650,64 +653,60 @@ export default {
       this.orderData.totalConsumption = 0;
     },
     // 确定兑换
-    buyGoods(refName) {
-      this.$refs[refName].validate(valid => {
-        if (valid) {
-          if (this.orderData.totalConsumption > this.vipData.score) {
-            this.$Modal.warning({
-              title: "兑换信息",
-              content: "<p>该用户积分不足！</p>"
-            });
-          } else {
-            var orderGoodsDataForAdmin = this.addGoodsData.map(e => {
-              return {
-                customerId: this.vipData.customerId,
-                paidScore: e.score,
-                quantity: e.count,
-                otherId: e.productId,
-                exchangeType: 1,
-                seller: this.orderData.seller
-              };
-            });
+    buyGoods() {
+      if (this.orderData.totalConsumption > this.vipData.score) {
+        this.$Modal.warning({
+          title: "兑换信息",
+          content: "<p>该用户积分不足！</p>"
+        });
+      } else {
+        var orderGoodsDataForAdmin = this.addGoodsData.map(e => {
+          return {
+            customerId: this.vipData.customerId,
+            paidScore: e.score,
+            quantity: e.count,
+            otherId: e.productId,
+            exchangeType: 1,
+            seller: this.orderData.seller
+          };
+        });
 
-            var orderServiceDataForAdmin = this.addServiceData.map(e => {
-              return {
-                customerId: this.vipData.customerId,
-                paidScore: e.score,
-                quantity: e.count,
-                otherId: e.id,
-                exchangeType: 2,
-                seller: this.orderData.seller
-              };
-            });
+        var orderServiceDataForAdmin = this.addServiceData.map(e => {
+          return {
+            customerId: this.vipData.customerId,
+            paidScore: e.score,
+            quantity: e.count,
+            otherId: e.id,
+            exchangeType: 2,
+            seller: this.orderData.seller
+          };
+        });
 
-            var exchangeOrder = orderGoodsDataForAdmin.concat(
-              orderServiceDataForAdmin
-            );
-            orderGoodsDataForAdmin = orderServiceDataForAdmin = null;
+        var exchangeOrder = orderGoodsDataForAdmin.concat(
+          orderServiceDataForAdmin
+        );
+        orderGoodsDataForAdmin = orderServiceDataForAdmin = null;
 
-            // console.log(exchangeOrder)
+        // console.log(exchangeOrder)
 
-            this.isKeep = true;
-            this.$http
-              .post("/exchange_score_list", exchangeOrder)
-              .then(res => {
-                this.getGoodsData(this.searchGoodsData);
-                this.getServiceData(this.searchGoodsData);
-                this.addGoodsData = [];
-                this.addServiceData = [];
-                this.orderData.totalConsumption = 0;
-                this.isKeep = false;
-                this.$Message.success("订单提交成功！");
-              })
-              .catch(err => {
-                console.log(err);
-                this.isKeep = false;
-                this.$Notice.error({ title: "订单提交失败！" });
-              });
-          }
-        }
-      });
+        this.isKeep = true;
+        this.$http
+          .post("/exchange_score_list", exchangeOrder)
+          .then(res => {
+            this.getGoodsData(this.searchGoodsData);
+            this.getServiceData(this.searchGoodsData);
+            this.addGoodsData = [];
+            this.addServiceData = [];
+            this.orderData.totalConsumption = 0;
+            this.isKeep = false;
+            this.$Message.success("订单提交成功！");
+          })
+          .catch(err => {
+            console.log(err);
+            this.isKeep = false;
+            this.$Notice.error({ title: "订单提交失败！" });
+          });
+      }
     }
   }
 };

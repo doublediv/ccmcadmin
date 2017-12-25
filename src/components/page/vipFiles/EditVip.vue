@@ -7,6 +7,7 @@
 import vipForm from "./common/VipForm.vue";
 export default {
   components: { vipForm }
+  
 };
 </script>
 <style lang="less" scoped>

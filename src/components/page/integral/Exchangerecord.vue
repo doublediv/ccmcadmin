@@ -37,8 +37,8 @@ export default {
       tableColumns: [
         { type: "index", align: "center", width: "60" },
         { title: "兑换单号", key: "refNo", align: "center" },
-        { title: "会员姓名", key: "tel", align: "center" },
-        { title: "会员手机", key: "vipcard", align: "center" },
+        { title: "会员姓名", key: "realName", align: "center" },
+        { title: "会员手机", key: "tel", align: "center" },
         { title: "兑换类型", key: "exchangeTypeString", align: "center" },
         { title: "兑换数量", key: "quantity", align: "center" },
         { title: "积分消费", key: "paidScore", align: "center" },
@@ -57,41 +57,61 @@ export default {
                   style: { marginRight: "5px" },
                   on: {
                     click: () => {
-                      console.log(params.row);
+                      // console.log(params.row);
                       this.$http
-                        .post("/exchange_score_detai", {
-                          exchangeOrderId: params.row.id,
-                        //   otherId: params.row.id,
-                          exchangeType: params.row.exchangeType
+                        .post("/exchange_score_detail", {
+                          exchangeOrderId: params.row.id
                         })
                         .then(res => {
-                          console.log(res);
+                          // console.log(res);
+                          var detailContent;
+                          if (params.row.exchangeTypeString === "商品兑换") {
+                            detailContent = `<p><span class="goodskey">兑换商品：</span>${res
+                              .data.exchangeDetail.otherName}</p>
+                              <p><span class="goodskey">所需积分：</span>${res.data
+                                .exchangeDetail.score}</p>`;
+                          } else {
+                            var costType;
+                            switch (res.data.exchangeDetail.costType) {
+                              case 1:
+                                costType = " 积分 / 天";
+                                break;
+                              case 2:
+                                costType = " 积分 / 小时";
+                                break;
+                              case 3:
+                                costType = " 积分 / 次数";
+                                break;
+
+                              default:
+                                break;
+                            }
+                            detailContent = `<p><span class="goodskey">服务类型：</span>${res
+                              .data.exchangeDetail.serviceCategory}</p>
+                              <p><span class="goodskey">服务项目：</span>${res.data
+                                .exchangeDetail.otherName}</p>
+                              <p><span class="goodskey">所需积分：</span>${res.data
+                                .exchangeDetail.score}${costType}</p>`;
+                          }
                           this.$Modal.info({
                             title: "积分兑换信息",
-                            content: `<p><span class="goodskey">商品类型：</span>${params
-                              .row.productCategoryName}</p>
-                                          <p><span class="goodskey">商品名称：</span>${params
-                                            .row.name}</p>
-                                          <p><span class="goodskey">商品编码：</span>${params
-                                            .row.number}</p>
-                                          <p><span class="goodskey">进价：</span>${params
-                                            .row.purchasePrice} 元</p>
-                                          <p><span class="goodskey">售价：</span>${params
-                                            .row.originalPrice} 元</p>
-                                          <p><span class="goodskey">参与积分兑换：</span>${params
-                                            .row.isScore}</p>
-                                          <p><span class="goodskey">所需积分：</span>${params
-                                            .row.score} 积分</p>
-                                          <p><span class="goodskey">参与会员优惠：</span>${params
-                                            .row.isVip}</p>
-                                          <p><span class="goodskey">金卡折扣：</span>${params
-                                            .row.goldDiscount} 折</p>
-                                          <p><span class="goodskey">银卡折扣：</span>${params
-                                            .row.silverDiscount} 折</p>
-                                          <p><span class="goodskey">普卡折扣：</span>${params
-                                            .row.commonDiscount} 折</p>
-                                          <p><span class="goodskey">创建时间：</span>${params
-                                            .row.createTime}</p>`
+                            content: `<p><span class="goodskey">兑换单号：</span>${res
+                              .data.exchangeDetail.refNO}</p>
+                              <p><span class="goodskey">会员姓名：</span>${res.data
+                                .exchangeDetail.realName}</p>
+                              <p><span class="goodskey">会员手机：</span>${res.data
+                                .exchangeDetail.phone}</p>
+                              <p><span class="goodskey">兑换类型：</span>${res.data
+                                .exchangeDetail.exchangeType}</p>
+                              ${detailContent}
+                              <p><span class="goodskey">兑换数量：</span>${res.data
+                                .exchangeDetail.quantity}</p>
+                              <p><span class="goodskey">总消费积分：</span>${res.data
+                                .exchangeDetail.total_score}</p>
+                              <p><span class="goodskey">兑换日期：</span>${res.data
+                                .exchangeDetail.createTime}</p>
+                              <p><span class="goodskey">操作员：</span>${res.data
+                                .exchangeDetail.userName}</p>`
                           });
                         })
                         .catch(err => {
@@ -124,7 +144,7 @@ export default {
       this.$http
         .post("/exchange_score_list", jsonData)
         .then(function(res) {
-        //   console.log(res);
+            // console.log(res);
           _this.tableData = res.data.exchange_record.map(function(e) {
             if (e.exchangeType == "1") {
               e.exchangeTypeString = "商品兑换";

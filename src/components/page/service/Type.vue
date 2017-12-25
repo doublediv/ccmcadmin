@@ -143,7 +143,6 @@ export default {
         { title: "服务类型", key: "serviceCategoryName", align: "center" },
         { title: "服务项目", key: "name", align: "center" },
         { title: "收费单价", key: "charge", align: "center" },
-        // { title: "计费方式", key: "costType", align: "center" },
         { title: "参与积分对换", key: "isCanScore", align: "center" },
         { title: "兑换所需积分", key: "score", align: "center" },
         {

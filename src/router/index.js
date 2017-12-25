@@ -42,11 +42,17 @@ export default new Router({
           meta: { ParentNmame: "会员档案管理" }
         },
         {
-          path: '/vipdata/healthdata',
-          name: '健康档案管理',
-          component: resolve => require(['../components/page/vipFiles/HealthData.vue'], resolve),
+          path: '/vipdata/vip/edit/:id',
+          name: '会员信息编辑',
+          component: resolve => require(['../components/page/vipFiles/EditVip.vue'], resolve),
           meta: { ParentNmame: "会员档案管理" }
         },
+        // {
+        //   path: '/vipdata/healthdata',
+        //   name: '健康档案管理',
+        //   component: resolve => require(['../components/page/vipFiles/HealthData.vue'], resolve),
+        //   meta: { ParentNmame: "会员档案管理" }
+        // },
         // 系统配置
         {
           path: '/system/account',
