@@ -131,7 +131,7 @@
                         <Option value=" 其他"> 其他</Option>
                     </Select>
                 </FormItem>
-                <upload-pic :fileType="fileType" @upSuccess="setPicUrl"><p class="tip">会员头像</p></upload-pic>
+                <upload-pic :fileType="fileType" @upSuccess="setPicUrl" :fatherPicUrl="baseData.headpic"><p class="tip">会员头像</p></upload-pic>
             </Col>
         </Row>
         <div class="button-box">
@@ -233,9 +233,16 @@ export default {
       this.$http
         .post("/getcustomerDetail", { customerId: this.vipId })
         .then(res => {
-          //   console.log(res);
+          // console.log(res);
           let dataFromAdmin = res.data.customer;
           dataFromAdmin.chronic = dataFromAdmin.chronic.split(",");
+          // 图片预加载
+          let img = new Image();
+          img.onload = () => {};
+          img.src = "http://192.168.1.149:8080" + dataFromAdmin.headpic;
+          dataFromAdmin.headpic = img.src
+          
+          delete dataFromAdmin.createTime;
           this.baseData = dataFromAdmin;
         })
         .catch(err => {
@@ -286,13 +293,7 @@ export default {
       this.$refs[refName].validate(valid => {
         if (valid) {
           let BaseDataForAdmin = JSON.parse(JSON.stringify(this.baseData));
-        //   if (BaseDataForAdmin.chronic.length < 1) {
-        //     BaseDataForAdmin.chronic = "";
-        //   } else {
-        //     BaseDataForAdmin.chronic = BaseDataForAdmin.chronic.join(",");
-        //   }
           BaseDataForAdmin.chronic = BaseDataForAdmin.chronic.join(",");
-          console.log(BaseDataForAdmin.chronic)
           if (this.vipId !== "") {
             BaseDataForAdmin.id = this.vipId;
           }
@@ -301,10 +302,10 @@ export default {
           this.$http
             .post("/add_customer", BaseDataForAdmin)
             .then(res => {
-              console.log(res);
+              // console.log(res);
               this.isKeep = false;
-              if (localStorage.getItem("vipId") !== "") {
-                this.vipId = es.data.customerId;
+              if (localStorage.getItem("vipId") === "") {
+                this.vipId = res.data.customer.id;
                 localStorage.setItem("vipId", res.data.customerId);
               }
               this.$Message.success("表单提交成功！");

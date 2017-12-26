@@ -25,7 +25,7 @@
                 <Option v-for="item in serviceItem" :value="item.id" :key="item.id">{{ item.name }}</Option>
             </Select>
         </FormItem>
-        <upload-pic :fileType="fileType" @upSuccess="setPicUrl"></upload-pic>
+        <upload-pic :fileType="fileType" :fatherPicUrl="addWaiterData.picUrl" @upSuccess="setPicUrl"></upload-pic>
         <div class="buttonbox">
             <Button type="ghost" @click="resetWaiter('addWaiterForm')">重置</Button>
             <Button :loading="isKeep" type="primary" @click="addWaiter('addWaiterForm')">提交</Button>

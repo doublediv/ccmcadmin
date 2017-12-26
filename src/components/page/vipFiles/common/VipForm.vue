@@ -9,9 +9,7 @@
             <a href="javascript:;" :class="{on: isOn.vipVisit}" @click="selectTemp('vipVisit')">就诊记录</a>
             <a href="javascript:;" :class="{on: isOn.vipCard}" @click="selectTemp('vipCard')">绑定会员卡号</a>
         </div>
-        <keep-alive>
-              <transition name="fade" mode="out-in"><component :is="currentView"></component></transition>
-        </keep-alive>
+        <transition name="fade" mode="out-in"><component :is="currentView"></component></transition>
     </div>
 </template>
 <script>
@@ -37,9 +35,21 @@ export default {
       currentView: "vipBase",
       isOn: {
         vipBase: true,
-        vipRelationship: false
+        vipRelationship: false,
+        vipHealth: false,
+        vipMedication: false,
+        vipHobby: false,
+        vipVisit: false,
+        vipCard: false
       }
     };
+  },
+  created() {
+    if (localStorage.getItem("isTemp")) {
+      this.currentView = localStorage.getItem("isTemp");
+      this.isOn[localStorage.getItem("isOn")] = true;
+      this.isOn.vipBase = false;
+    }
   },
   methods: {
     selectTemp(tempName) {
@@ -50,9 +60,11 @@ export default {
         });
       } else {
         this.currentView = tempName;
+        localStorage.setItem("isTemp", this.currentView);
         for (var key in this.isOn) {
           if (key == tempName) {
             this.isOn[key] = true;
+            localStorage.setItem("isOn", key);
           } else {
             this.isOn[key] = false;
           }

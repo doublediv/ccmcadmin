@@ -87,6 +87,10 @@ export default {
     line-height: 46px;
     margin-top: 12px;
     text-align: center;
+    padding: 0 290px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   .user-info {

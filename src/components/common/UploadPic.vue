@@ -3,7 +3,7 @@
         <slot>上传证件照</slot>
         <div class="samll-img">
             <div v-show="havePic" class="picbox">
-                <Avatar class="avatarPic" icon="person" shape="square" :src="picUrl" />
+                <Avatar class="avatarPic" icon="image" shape="square" :src="getFatherPicUrl" alt="图片" />
                 <div class="handle-pic">
                     <Icon type="ios-eye-outline" @click.native="viewPic"></Icon>
                     <Icon type="ios-trash-outline" @click.native="removePic"></Icon>
@@ -31,16 +31,16 @@
             </Upload>
         </div>
         <Modal class-name="bigPic" width="360" title="查看图片" v-model="isView">
-            <img :src="picUrl" alt="" />
+            <img :src="getFatherPicUrl" alt="" />
         </Modal>
     </div>
 </template>
 <script>
 export default {
-  props: ["fileType"],
+  props: ["fileType", "fatherPicUrl"],
   data() {
     return {
-      picUrl: "",
+      // picUrl: getFatherPicUrl,
       havePic: false,
       isSpin: false,
       isUplod: true,
@@ -48,20 +48,36 @@ export default {
       uploadType: 2
     };
   },
+  computed: {
+    getFatherPicUrl() {
+      console.log(this.fatherPicUrl)
+      let imgReg = /[.jpg|.png|.jpeg]$/;
+      if (imgReg.test(this.fatherPicUrl)) {
+        this.havePic = true;
+        this.isUplod = false;
+      }
+      return this.fatherPicUrl;
+    }
+  },
   methods: {
+    // 查看图片
     viewPic() {
       this.isView = true;
     },
+    // 删除图片
     removePic(file) {
       this.isUplod = "";
       this.havePic = false;
       this.isUplod = true;
+      this.$emit("upSuccess", "");
     },
+    // 图片上传前
     uploadBefore() {
       this.isSpin = true;
       this.isUplod = false;
       return;
     },
+    // 图片格式错误
     uploadFormatError(file) {
       this.isSpin = false;
       this.isUplod = true;
@@ -70,6 +86,7 @@ export default {
         desc: "图片" + file.name + "格式不对,请上传jpg/jpeg/png格式的图片"
       });
     },
+    // 图片容量过大
     uploadMaxSize(file) {
       this.isSpin = false;
       this.isUplod = true;
@@ -78,6 +95,7 @@ export default {
         desc: "图片  " + file.name + " 过大, 请上传大小不超过2M的图片."
       });
     },
+    // 图片上传失败
     uploadError(err) {
       this.isSpin = false;
       this.isUplod = true;
@@ -86,18 +104,17 @@ export default {
         desc: "图片上传失败！"
       });
     },
+    // 图片上传成功
     uploadSuccess(res, file) {
-      
       let img = new Image();
       img.onload = () => {
         this.isSpin = false;
         this.havePic = true;
-        this.picUrl = img.src;
-        this.$emit("upSuccess", res.avatar_path);
+        // this.picUrl = img.src;
+        this.$emit("upSuccess", img.src);
       };
       img.src = "http://192.168.1.149:8080" + res.avatar_path;
     }
-    
   }
 };
 </script>
@@ -115,6 +132,10 @@ export default {
     .avatarPic {
       width: 100%;
       height: 100%;
+
+      .ivu-icon{
+        line-height: 58px;
+      }
     }
 
     .handle-pic {

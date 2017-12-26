@@ -33,6 +33,14 @@ export default {
     },
     // 设置侧边选中栏
     setActiveName() {
+      // 清除会员Id
+      var removeReg = /^\/vipdata\/vip\/edit/
+      if(!removeReg.test(this.$route.path)){
+        localStorage.removeItem("vipId");
+      }
+      // 清除会员卡号
+      localStorage.removeItem("vipnumber")
+
       if (this.$route.path == "/home") {
         return "";
       } else {
@@ -41,18 +49,12 @@ export default {
       }
     }
   },
-  // watch: {
-  //   $route() {
-  //     // 设置侧边展开栏
-  //     if (this.$route.path == "/home") {
-  //       console.log(this.$refs.sidebarMenu.updateOpened());
-  //       this.$refs.sidebarMenu.updateOpened();
-  //     }
-  //   }
-  // },
   methods: {
     // 侧边导航选择
     menuSelect(name) {
+      // 清除新增会员默认模版
+      localStorage.removeItem("isTemp")
+      localStorage.removeItem("isOn")
       this.$router.push(name);
     }
   }

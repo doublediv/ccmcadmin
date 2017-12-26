@@ -83,7 +83,7 @@
                     </FormItem>
                 </Col>
                 <Col span="24">
-                    <upload-pic :fileType="fileType" @upSuccess="setPicUrl"></upload-pic>
+                    <upload-pic :fileType="fileType" :fatherPicUrl="addFacilitatorData.picUrl" @upSuccess="setPicUrl"></upload-pic>
                 </Col>
                 <Col span="24">
                     <FormItem label="备注:">
@@ -284,6 +284,7 @@ export default {
     },
     // 获取上传图片的地址
     setPicUrl(imgUrl) {
+      // console.log(1,imgUrl)
       this.addFacilitatorData.picUrl = imgUrl;
     },
     // 新增服务商

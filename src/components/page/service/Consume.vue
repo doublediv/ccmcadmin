@@ -1,6 +1,14 @@
 <template>
   <div class="consume-box">
     <p class="title">添加服务消费</p>
+    <Form :model="searchVipData" inline :label-width="100">
+        <FormItem label="会员搜索:">
+            <Input type="text" v-model="searchVipData.content" placeholder="请读取卡号或输入手机号"></Input>
+        </FormItem>
+        <Button class="singlebutton" type="primary" @click="linkDevice">连接设备</Button>
+        <Button class="singlebutton" type="primary" @click="toFindTheCard">双击读卡</Button>
+        <Button class="singlebutton" icon="ios-search" :loading="isSearchVip" type="primary" @click="searchVip">搜索</Button>
+    </Form>
     <Form ref="servConForm" :model="servConData" :rules="servConRule" :label-width="100">
         <FormItem label="创建人:">
             <Input disabled v-model="servConData.creater"></Input>
@@ -9,7 +17,7 @@
             <Input v-model="servConData.phone" placeholder="请输入会员联系电话"></Input>
         </FormItem>
         <FormItem label="消费时间:" prop="paidTime">
-            <DatePicker v-model="servConData.paidTime" @on-change="setDate" type="date" placeholder="请选择消费时间" style="width: 100%"></DatePicker>
+            <DatePicker v-model="servConData.paidTime" @on-change="setDate" type="datetime" placeholder="请选择消费时间" style="width: 100%"></DatePicker>
         </FormItem>
         <FormItem label="服务类型:">
             <Select placeholder="请选择服务类型" style="width:100%" @on-change="getServiceItem">
@@ -67,6 +75,10 @@ export default {
       isGetServiceItem: false,
       waiter: [],
       isGetWaiter: false,
+      searchVipData: {
+        content: ""
+      },
+      isSearchVip: false,
       servConData: {
         creater: "",
         phone: "",
@@ -95,6 +107,51 @@ export default {
     this.servConData.creater = localStorage.getItem("username");
   },
   methods: {
+     //   链接设备
+    linkDevice() {
+      this.$layout.linkDevice();
+    },
+    // 读卡
+    toFindTheCard() {
+      this.$layout.toFindTheCard();
+      this.searchVipData.content = JSON.parse(
+        localStorage.getItem("vipnumber")
+      );
+    },
+    //   搜索会员
+    searchVip() {
+      localStorage.removeItem("vipnumber");
+      this.isSearchVip = true;
+      this.$http
+        .post("/get_VIP_card_base", this.searchVipData)
+        .then(res => {
+            console.log(res);
+          switch (res.data.status) {
+            case 3001:
+              this.$Notice.error({ title: "会员卡号不存在" });
+              for (var key in this.vipData) {
+                this.vipData[key] = "";
+              }
+              break;
+            case 3002:
+              this.$Notice.error({ title: "会员卡号已被挂失" });
+              break;
+            case 3003:
+              this.$Notice.error({ title: "会员卡号已被禁用或者注销" });
+              break;
+
+            default:
+              this.servConData.phone = res.data.vipcustomer.tel;
+              break;
+          }
+          this.isSearchVip = false;
+        })
+        .catch(err => {
+          console.log(err);
+          this.isSearchVip = false;
+          this.$Notice.error({ title: "会员信息获取失败！" });
+        });
+    },
     // 获取服务类型
     getServiceType() {
       this.$http
@@ -220,7 +277,7 @@ export default {
 </script>
 <style lang="less" scoped>
 .consume-box {
-  width: 500px;
+  width: 602px;
   margin: 24px auto 0;
   border: 1px solid #ccc;
   border-radius: 5px;
