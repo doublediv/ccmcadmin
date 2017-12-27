@@ -32,8 +32,8 @@
         </FormItem>
         <FormItem label="服务提供:" prop="serviceType">
             <Select v-model="servConData.serviceType" placeholder="请选择服务提供" :loading="isGetServiceItem" style="width:100%" @on-change="getWaiter">
-                <Option value="1">供应商服务</Option>
                 <Option value="2">本基站人员服务</Option>
+                <Option value="1">供应商服务</Option>
             </Select>
         </FormItem>
         <FormItem label="服务人员:" prop="serviceId">
@@ -44,6 +44,12 @@
         </FormItem>
         <FormItem label="收费标准:" prop="feeScale">
             <Input v-model="servConData.feeScale" disabled placeholder="请选择服务项目"></Input>
+        </FormItem>
+        <FormItem label="消费数量:" prop="quantity">
+            <Input v-model="servConData.quantity" placeholder="请输入消费数量" @on-blur="liquidation"></Input>
+        </FormItem>
+        <FormItem label="总消费金额:" prop="totalMoney">
+            <Input v-model="servConData.totalMoney" disabled placeholder="请选择服务项目"></Input>
         </FormItem>
         <FormItem label="消费获得积分:" prop="obtainIntegral">
             <Input v-model="servConData.obtainIntegral" disabled placeholder="请选择服务项目"></Input>
@@ -86,8 +92,11 @@ export default {
         serviceProjectId: "",
         serviceType: "",
         serviceId: "",
+        price: "",
         feeScale: "",
-        obtainIntegral: ""
+        quantity: "0",
+        totalMoney: "0",
+        obtainIntegral: "0"
       },
       servConRule: {
         phone: [{ required: true, validator: phoneRule }],
@@ -95,8 +104,10 @@ export default {
         serviceProjectId: [{ required: true, message: "请选服务项目" }],
         serviceType: [{ required: true, message: "请选服务提供" }],
         serviceId: [{ required: true, message: "请选服务人员" }],
+        quantity: [{ required: true, message: "请输入消费数量" }],
         feeScale: [{ required: true, message: "请选服务人员" }],
-        obtainIntegral: [{ required: true, message: "请选服务人员" }]
+        totalMoney: [{ required: true, message: "请输入消费总金额" }],
+        obtainIntegral: [{ required: true, message: "请输入消费获得积分" }]
       },
 
       isKeep: false
@@ -107,7 +118,7 @@ export default {
     this.servConData.creater = localStorage.getItem("username");
   },
   methods: {
-     //   链接设备
+    //   链接设备
     linkDevice() {
       this.$layout.linkDevice();
     },
@@ -125,7 +136,7 @@ export default {
       this.$http
         .post("/get_VIP_card_base", this.searchVipData)
         .then(res => {
-            console.log(res);
+          // console.log(res);
           switch (res.data.status) {
             case 3001:
               this.$Notice.error({ title: "会员卡号不存在" });
@@ -167,9 +178,9 @@ export default {
     },
     // 获取服务项目
     getServiceItem(serviceTypeId) {
-        this.serviceItem = [];
+      this.serviceItem = [];
       this.isGetServiceItem = true;
-      
+
       this.$http
         .post("/get_service_project", { serviceCategoryId: serviceTypeId })
         .then(res => {
@@ -185,15 +196,14 @@ export default {
     },
     // 获取服务项目价格
     getServicePrice(serviceId) {
-        this.servConData.feeScale = "";
-      this.servConData.obtainIntegral = "";
+      this.servConData.feeScale = "";
       this.$http
         .post("/get_service_project_pay", { serviceProjectId: serviceId })
         .then(res => {
           //   console.log(res);
           this.servConData.feeScale =
             res.data.price + " / " + res.data.costType;
-          this.servConData.obtainIntegral = res.data.price;
+          this.servConData.price = res.data.price;
         })
         .catch(err => {
           console.log(err);
@@ -203,6 +213,11 @@ export default {
     // 设置时间
     setDate(date) {
       this.servConData.paidTime = Date.parse(new Date(date));
+    },
+    // 结算
+    liquidation() {
+      this.servConData.totalMoney = this.servConData.obtainIntegral =
+        this.servConData.quantity * this.servConData.price;
     },
     // 获取消费人员
     getWaiter() {
@@ -256,7 +271,8 @@ export default {
               phone: this.servConData.phone,
               paidTime: this.servConData.paidTime,
               serviceId: this.servConData.serviceId,
-              serviceType: this.servConData.serviceType
+              serviceType: this.servConData.serviceType,
+              quantity: this.servConData.quantity
             })
             .then(res => {
               // console.log(res);
@@ -278,7 +294,7 @@ export default {
 <style lang="less" scoped>
 .consume-box {
   width: 602px;
-  margin: 24px auto 0;
+  margin: 0 auto;
   border: 1px solid #ccc;
   border-radius: 5px;
   padding: 30px;

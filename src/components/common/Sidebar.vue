@@ -15,7 +15,12 @@ export default {
     // 获取侧边栏
     sidebarNav() {
       let sidebarNav = JSON.parse(localStorage.getItem("sidebarnav"));
-      return sidebarNav;
+      // if(sidebarNav){
+      //   return sidebarNav
+      // } else {
+      //   return []
+      // }
+      return sidebarNav
     },
     // 设置侧边展开栏
     setOpenName() {

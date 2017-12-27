@@ -1,11 +1,23 @@
 <template>
     <div>
-        <Form :model="searchData" inline :label-width="70">
+        <Form :model="searchData" inline :label-width="80">
             <FormItem label="会员姓名:">
                 <Input v-model="searchData.realName" placeholder="按会员姓名搜索"></Input>
             </FormItem>
             <FormItem label="会员手机:">
                 <Input v-model="searchData.tel" placeholder="按会员姓名搜索"></Input>
+            </FormItem>
+            <FormItem v-if="isZb" label="所属分公司:">
+                <Select v-model="searchData.fgs" placeholder="按所属分公司搜索" @on-change="getJcompany" style="width:164px">
+                    <Option value="">请选择</Option>
+                    <Option v-for="item in companyArr" :value="item.id" :key="item.id">{{ item.name }}</Option>
+                </Select>
+            </FormItem>
+            <FormItem v-if="!isJz" label="所属基站:">
+                <Select v-model="searchData.jz" placeholder="按所属基站搜索" @on-change="selectJz" style="width:164px">
+                  <Option value="">请选择</Option>
+                  <Option v-for="item in baseStationArr" :value="item.id" :key="item.id">{{ item.name }}</Option>
+                </Select>
             </FormItem>
             <FormItem label="消费时间:">
                 <DatePicker @on-change="setSearchDate" type="daterange" placement="bottom-end" placeholder="按充值时间搜索" style="width: 200px"></DatePicker>
@@ -21,9 +33,16 @@
 export default {
   data() {
     return {
+      companyArr: [],
+      baseStationArr: [],
+      isZb: false,
+      isJz: false,
       searchData: {
         realName: "",
         tel: "",
+        fgs: "",
+        jz: "",
+        companyId: "",
         startTime: "",
         endTime: "",
         limit: 10,
@@ -48,9 +67,58 @@ export default {
     };
   },
   created() {
+    //   初始数据
+    switch (localStorage.getItem("companyCategory")) {
+      case "1":
+        this.isZb = true;
+        this.getFcompany();
+        break;
+      case "2":
+        this.getJcompany(localStorage.getItem("companyId"));
+        break;
+      case "3":
+        this.isJz = true;
+        break;
+
+      default:
+        break;
+    }
     this.getData(this.searchData);
   },
   methods: {
+    // 获取分公司列表
+    getFcompany() {
+      this.$http
+        .post("/get_f_company")
+        .then(res => {
+          // console.log(res);
+          this.companyArr = res.data.companys;
+        })
+        .catch(err => {
+          console.log(err);
+          this.$Notice.error({ title: "分公司列表获取失败！" });
+        });
+    },
+    // 根据分公司ID获取基站列表
+    getJcompany(id) {
+      this.searchData.companyCategory = "2";
+      this.searchData.companyId = this.searchData.fgs;
+      this.$http
+        .post("/get_j_company", { companyId: id })
+        .then(res => {
+          // console.log(res);
+          this.baseStationArr = res.data.companys;
+        })
+        .catch(err => {
+          console.log(err);
+          this.$Notice.error({ title: "基站列表获取失败！" });
+        });
+    },
+    // 选择基站
+    selectJz() {
+      this.searchData.companyCategory = "3";
+      this.searchData.companyId = this.searchData.jz;
+    },
     // 获取数据
     getData(jsonData) {
       const _this = this;

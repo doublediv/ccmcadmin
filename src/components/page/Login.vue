@@ -4,10 +4,10 @@
             <div class="card-header"><img src="~@/assets/img/login_logo.png" alt="" /></div>
             <Form class="login-form" ref="loginForm" :model="loginData" :rules="ruleLogin" :label-width="60">
                 <FormItem label="帐号：" prop="username">
-                    <Input type="text" v-model="loginData.username" placeholder="请输入帐号"></Input>
+                    <Input type="text" v-model="loginData.username" placeholder="请输入帐号" @on-enter="signIn('loginForm')"></Input>
                 </FormItem>
                 <FormItem label="密码：" prop="password">
-                    <Input type="password" v-model="loginData.password" placeholder="请输入密码"></Input>
+                    <Input type="password" v-model="loginData.password" placeholder="请输入密码" @on-enter="signIn('loginForm')"></Input>
                 </FormItem>
                 <FormItem>
                     <Button type="primary" long :loading="isLogin" @click="signIn('loginForm')">登录</Button>
@@ -43,12 +43,21 @@ export default {
             .post("/login", this.loginData)
             .then(function(res) {
               // console.log(res);
-              if(res.data.status === 2002) {
-                _this.$Notice.error({title: "用户名或密码错误,登录失败!"});
+              if (res.data.status === 2002) {
+                _this.$Notice.error({ title: "用户名或密码错误,登录失败!" });
                 _this.isLogin = false;
               } else {
+                // 总站 1， 分公司 2， 基站 3
+                localStorage.setItem(
+                  "companyCategory",
+                  res.data.user.companyCategory
+                );
+                localStorage.setItem("companyId", res.data.user.companyId)
                 localStorage.setItem("username", res.data.user.userName);
-                localStorage.setItem("sidebarnav", JSON.stringify(res.data.user.permission));
+                localStorage.setItem(
+                  "sidebarnav",
+                  JSON.stringify(res.data.user.permission)
+                );
                 _this.$Message.success("登录成功!");
                 _this.isLogin = false;
                 _this.$router.push("/home");
@@ -56,7 +65,7 @@ export default {
             })
             .catch(function(err) {
               console.log(err);
-              _this.$Notice.error({title: "登录失败!"});
+              _this.$Notice.error({ title: "登录失败!" });
               _this.isLogin = false;
             });
         }

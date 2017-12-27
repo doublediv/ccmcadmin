@@ -113,7 +113,7 @@ export default {
         // this.picUrl = img.src;
         this.$emit("upSuccess", img.src);
       };
-      img.src = "http://192.168.1.149:8080" + res.avatar_path;
+      img.src = res.avatar_path;
     }
   }
 };

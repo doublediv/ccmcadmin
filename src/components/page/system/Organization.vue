@@ -1,19 +1,19 @@
 <template>
   <div>
-      <Form :model="searchData" inline :label-width="80">
-        <FormItem label="所属公司:">
-            <Select v-model="searchData.company" placeholder="请选择" style="width:164px">
-                <Option value="">请选择</Option>
+      <Form v-if="isNoJz" :model="searchData" inline :label-width="80">
+        <FormItem label="所属分公司:" v-if="!isFgs">
+            <Select v-model="searchData.fCompanyId" placeholder="按所属分公司搜索" @on-change="getJcompany" style="width:164px">
+                <Option v-for="item in companyArr" :value="item.id" :key="item.id">{{ item.name }}</Option>
             </Select>
         </FormItem>
         <FormItem label="所属基站:">
-            <Select v-model="searchData.baseStation" placeholder="请选择" style="width:164px">
-                <Option value="">请选择</Option>
+            <Select v-model="searchData.jCompanyId" placeholder="按所属基站搜索" style="width:164px">
+              <Option v-for="item in baseStationArr" :value="item.id" :key="item.id">{{ item.name }}</Option>
             </Select>
         </FormItem>
         <Button class="singlebutton" icon="ios-search" :loading="isSearch" type="primary" @click="search">搜索</Button>
     </Form>
-    <Button class="addbutton" icon="plus-round" type="dashed" @click="showAddMechanismType">新增机构类型</Button>
+    <Button v-show="isNoJz" class="addbutton" icon="plus-round" type="dashed" @click="showAddMechanismType">新增机构类型</Button>
     <v-table ref="vTable" :tableColumns="tableColumns" :tableData="tableData" :isPage="isPage"></v-table>
     <!-- 新增 -->
     <Modal 
@@ -26,18 +26,17 @@
         <Form ref="addOrganizationForm" :model="addOrganizationData" :rules="addOrganizationRules" :label-width="90">
             <FormItem label="机构类型:" prop="category">
                 <RadioGroup v-model="addOrganizationData.category">
-                    <Radio disabled label="1">总部</Radio>
-                    <Radio disabled label="2">分公司</Radio>
-                    <Radio label="3">基站</Radio>
+                    <Radio :disabled="isFgs" label="2">分公司</Radio>
+                    <Radio :disabled="isJz" label="3">基站</Radio>
                 </RadioGroup>
             </FormItem>
-            <FormItem label="基站名称:" prop="name">
-                <Input type="text" v-model="addOrganizationData.name" placeholder="请输入基站名称"></Input>
+            <FormItem label="名称:" prop="name">
+                <Input :disabled="!isNoJz" type="text" v-model="addOrganizationData.name" placeholder="请输入名称"></Input>
             </FormItem>
         </Form>
         <div slot="footer" class="button-box">
             <Button type="ghost" @click="cancel('addOrganizationForm', 'isAddShow')">取消</Button>
-            <Button type="primary" :loading="isKeep"  @click="keepOrganization('addOrganizationForm')">保存</Button>
+            <Button :disabled="!isNoJz" type="primary" :loading="isKeep"  @click="keepOrganization('addOrganizationForm')">保存</Button>
         </div>
     </Modal>
   </div>
@@ -48,15 +47,19 @@ export default {
   components: { vTable },
   data() {
     return {
+      companyArr: [],
+      baseStationArr: [],
+      SelectTip: "请先选择分公司",
+      isLodingJz: true,
       searchData: {
-        company: "",
-        baseStation: ""
+        fCompanyId: "",
+        jCompanyId: ""
       },
       isSearch: false,
       tableColumns: [
         { type: "index", align: "center", width: "60" },
+        { title: "名称", key: "name", align: "center" },
         { title: "机构类型", key: "category", align: "center" },
-        { title: "基站名称", key: "name", align: "center" },
         {
           title: "操作",
           key: "action",
@@ -71,15 +74,12 @@ export default {
                   style: { marginRight: "5px" },
                   on: {
                     click: () => {
-                      this.eidthformTitle = "编辑机构类型";
+                      this.eidthformTitle = "查看编辑机构类型";
                       this.isAddShow = true;
                       this.addOrganizationData = JSON.parse(
                         JSON.stringify(params.row)
                       );
                       switch (this.addOrganizationData.category) {
-                        case "总站":
-                          this.addOrganizationData.category = "1";
-                          break;
                         case "分公司":
                           this.addOrganizationData.category = "2";
                           break;
@@ -93,7 +93,7 @@ export default {
                     }
                   }
                 },
-                "编辑机构"
+                "查看编辑"
               ),
               h(
                 "Button",
@@ -114,6 +114,9 @@ export default {
       tableData: [],
       isPage: false,
       isAddShow: false,
+      isNoJz: true,
+      isFgs: true,
+      isJz: true,
       eidthformTitle: "",
       addOrganizationData: {
         category: "",
@@ -127,23 +130,74 @@ export default {
     };
   },
   created() {
+    switch (localStorage.getItem("companyCategory")) {
+      case "1":
+        this.isFgs = false;
+        this.getFcompany();
+        break;
+      case "2":
+        this.isJz = false;
+        this.getJcompany(localStorage.getItem("companyId"));
+        break;
+      case "3":
+        this.isNoJz = false;
+        break;
+
+      default:
+        break;
+    }
     this.getOrganizationData();
   },
   methods: {
+    // 获取分公司列表
+    getFcompany() {
+      this.$http
+        .post("/get_f_company")
+        .then(res => {
+          // console.log(res);
+          this.companyArr = res.data.companys;
+        })
+        .catch(err => {
+          console.log(err);
+          this.$Notice.error({ title: "分公司列表获取失败！" });
+        });
+    },
+    // 根据分公司ID获取基站列表
+    getJcompany(id) {
+      this.$http
+        .post("/get_j_company", { companyId: id })
+        .then(res => {
+          // console.log(res);
+          this.baseStationArr = res.data.companys;
+        })
+        .catch(err => {
+          console.log(err);
+          this.$Notice.error({ title: "基站列表获取失败！" });
+        });
+    },
     // 搜索
-    search() {},
+    search() {
+      this.isSearch = true;
+      this.getOrganizationData();
+    },
     // 获取机构类型
     getOrganizationData() {
       const _this = this;
       this.$http
-        .post("/getcompanys")
+        .post("/getcompanys", this.searchData)
         .then(function(res) {
-          //   console.log(res);
+          // console.log(res);
           _this.tableData = res.data.companys;
+          if (_this.isSearch) {
+            _this.isSearch = false;
+          }
         })
         .catch(function(err) {
           console.log(err);
           _this.$Notice.error({ title: "机构类型获取失败！" });
+          if (_this.isSearch) {
+            _this.isSearch = false;
+          }
         });
     },
     // 弹出新增机构类型

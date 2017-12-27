@@ -4,16 +4,16 @@
             <FormItem label="会员姓名:">
                 <Input v-model="searchData.customerName" placeholder="按会员姓名搜索"></Input>
             </FormItem>
-            <FormItem label="服务类型:">
-                <Select placeholder="按服务类型搜索" style="width:164px" @on-change="getServiceItem">
+            <FormItem v-if="isJz" label="服务类型:">
+                <Select v-model="searchData.serviceCategoryId" placeholder="按服务类型搜索" style="width:164px" @on-change="getServiceItem">
                     <Option value="">请选择</Option>
                     <Option v-for="item in serviceType" :value="item.id" :key="item.id">{{ item.name }}</Option>
                 </Select>
             </FormItem>
-            <FormItem label="服务项目:">
-                <Select v-model="searchData.projectName" placeholder="按服务项目搜索" :loading="isGetServiceItem" style="width:164px">
+            <FormItem v-if="isJz" label="服务项目:">
+                <Select v-model="searchData.projectId" placeholder="按服务项目搜索" :loading="isGetServiceItem" style="width:164px">
                     <Option value="">请选择</Option>
-                    <Option v-for="item in serviceItem" :value="item.name" :key="item.id">{{ item.name }}</Option>
+                    <Option v-for="item in serviceItem" :value="item.id" :key="item.id">{{ item.name }}</Option>
                 </Select>
             </FormItem>
             <FormItem label="服务时间:">
@@ -30,12 +30,15 @@
 export default {
   data() {
     return {
+      isJz: false,
       serviceType: [],
       serviceItem: [],
       isGetServiceItem: false,
       searchData: {
-        customerName: "",
-        projectName: "",
+        // customerName: "",
+        // projectName: "",
+        projectId: "",
+        serviceCategoryId: "",
         startTime: "",
         endTime: "",
         limit: 10,
@@ -44,7 +47,6 @@ export default {
       isSearch: false,
       tableColumns: [
         { type: "index", align: "center", width: "60" },
-        { title: "客户ID", key: "customerId", align: "center" },
         { title: "客户姓名", key: "customerName", align: "center" },
         { title: "联系方式", key: "phone", align: "center" },
         { title: "所属基站", key: "companyName", align: "center" },
@@ -63,7 +65,16 @@ export default {
     };
   },
   created() {
-    this.getServiceType();
+    //   初始数据
+    switch (localStorage.getItem("companyCategory")) {
+      case "3":
+        this.isJz = true;
+        this.getServiceType();
+        break;
+
+      default:
+        break;
+    }
     this.getData(this.searchData);
   },
   methods: {

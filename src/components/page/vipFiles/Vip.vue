@@ -10,6 +10,18 @@
             <FormItem label="联系方式:">
                 <Input type="text" v-model="searchData.phone" placeholder="按手机号搜索"></Input>
             </FormItem>
+            <FormItem v-if="isZb" label="所属分公司:">
+                <Select v-model="searchData.fgs" placeholder="按所属分公司搜索" @on-change="getJcompany" style="width:164px">
+                    <Option value="">请选择</Option>
+                    <Option v-for="item in companyArr" :value="item.id" :key="item.id">{{ item.name }}</Option>
+                </Select>
+            </FormItem>
+            <FormItem v-if="!isJz" label="所属基站:">
+                <Select v-model="searchData.jz" placeholder="按所属基站搜索" @on-change="selectJz" style="width:164px">
+                  <Option value="">请选择</Option>
+                  <Option v-for="item in baseStationArr" :value="item.id" :key="item.id">{{ item.name }}</Option>
+                </Select>
+            </FormItem>
             <Button class="singlebutton" icon="ios-search" :loading="isSearch" type="primary" @click="search">搜索</Button>
         </Form>
         <v-table ref="vTable" :tableColumns="tableColumns" :tableData="tableData" :totalPage="totalPage" :isPage="isPage" @getPage="selectPage"></v-table>
@@ -22,10 +34,18 @@ export default {
   components: { vTable },
   data() {
     return {
+      companyArr: [],
+      baseStationArr: [],
+      isZb: false,
+      isJz: false,
       searchData: {
         name: "",
         idCard: "",
         phone: "",
+        fgs: "",
+        jz: "",
+        companyId: "",
+        companyCategory: "",
         limit: 10,
         page: 0
       },
@@ -54,7 +74,9 @@ export default {
                   on: {
                     click: () => {
                       // console.log(params.row)
-                      this.$router.push("/vipdata/vip/edit/" + params.row.customerId);
+                      this.$router.push(
+                        "/vipdata/vip/edit/" + params.row.customerId
+                      );
                     }
                   }
                 },
@@ -85,7 +107,10 @@ export default {
                               _this.$Modal.remove();
                               _this.tableData.splice(params.index, 1);
                               _this.$Message.success("会员删除成功!");
-                              _this.getData("/getcustomer", { limit: 10, page: 1 });
+                              _this.getData("/getcustomer", {
+                                limit: 10,
+                                page: 1
+                              });
                             })
                             .catch(function(err) {
                               console.log(err);
@@ -109,9 +134,57 @@ export default {
   },
   created() {
     //   初始数据
-    this.getData("/getcustomer", { limit: 10, page: 0 });
+    switch (localStorage.getItem("companyCategory")) {
+      case "1":
+        this.isZb = true;
+        this.getFcompany();
+        break;
+      case "2":
+        this.getJcompany(localStorage.getItem("companyId"));
+        break;
+      case "3":
+        this.isJz = true;
+        break;
+
+      default:
+        break;
+    }
+    this.getData("/getcustomer", this.searchData);
   },
   methods: {
+    // 获取分公司列表
+    getFcompany() {
+      this.$http
+        .post("/get_f_company")
+        .then(res => {
+          // console.log(res);
+          this.companyArr = res.data.companys;
+        })
+        .catch(err => {
+          console.log(err);
+          this.$Notice.error({ title: "分公司列表获取失败！" });
+        });
+    },
+    // 根据分公司ID获取基站列表
+    getJcompany(id) {
+      this.searchData.companyCategory = "2";
+      this.searchData.companyId = this.searchData.fgs;
+      this.$http
+        .post("/get_j_company", { companyId: id })
+        .then(res => {
+          // console.log(res);
+          this.baseStationArr = res.data.companys;
+        })
+        .catch(err => {
+          console.log(err);
+          this.$Notice.error({ title: "基站列表获取失败！" });
+        });
+    },
+    // 选择基站
+    selectJz() {
+      this.searchData.companyCategory = "3";
+      this.searchData.companyId = this.searchData.jz;
+    },
     // 获取数据
     getData(url, jsonData) {
       const _this = this;
@@ -158,11 +231,11 @@ export default {
     search() {
       this.isSearch = true;
       this.isPage = false;
-      this.getData("/search_customer", this.searchData);
+      this.getData("/getcustomer", this.searchData);
     },
     // 选页
     selectPage(pageNum) {
-      this.getData("/getcustomer", { limit: 10, page: pageNum });
+      this.getData("/getcustomer", {limit: 10, page: pageNum});
     }
   }
 };

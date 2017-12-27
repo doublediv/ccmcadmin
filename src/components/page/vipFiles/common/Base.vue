@@ -239,7 +239,7 @@ export default {
           // 图片预加载
           let img = new Image();
           img.onload = () => {};
-          img.src = "http://192.168.1.149:8080" + dataFromAdmin.headpic;
+          img.src = dataFromAdmin.headpic;
           dataFromAdmin.headpic = img.src
           
           delete dataFromAdmin.createTime;
