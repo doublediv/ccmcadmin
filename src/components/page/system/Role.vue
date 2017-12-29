@@ -217,41 +217,39 @@ export default {
       });
 
       this.isKeep = true;
-      const _this = this;
       this.$http
         .post("/add_role_permission", powerDataForAdmin)
-        .then(function(res) {
+        .then(res => {
           //   console.log(res);
-          _this.$Message.success("权限设置成功!");
-          _this.isKeep = false;
-          _this.isEditPowerShow = false;
+          this.$Message.success("权限设置成功!");
+          this.isKeep = false;
+          this.isEditPowerShow = false;
 
           this.$Modal.confirm({
             title: "权限设置",
-            content: <p>权限编辑成功，是否立即重新登录获取新权限？</p>,
+            content: "<p>权限编辑成功，是否立即重新登录获取新权限？</p>",
             okText: "立即重登",
             cancelText: "稍后重登",
             loading: true,
             onOk: () => {
               // 退出
-              const _this = this;
               this.$http
                 .post("/logout")
-                .then(function(res) {
+                .then(res => {
                   // console.log(res);
                   localStorage.clear();
-                  _this.$Message.success("退出成功!");
-                  _this.$Modal.remove();
-                  _this.$router.push("/");
+                  this.$Message.success("退出成功!");
+                  this.$Modal.remove();
+                  this.$router.push("/");
                 })
-                .catch(function(err) {
+                .catch(err => {
                   console.log(err);
-                  _this.$Notice.error({ title: "退出失败!" });
+                  this.$Notice.error({ title: "退出失败!" });
                 });
             }
           });
         })
-        .catch(function(err) {
+        .catch(err => {
           console.log(err);
           _this.isKeep = false;
           _this.$Notice.error({ title: "权限设置失败!" });

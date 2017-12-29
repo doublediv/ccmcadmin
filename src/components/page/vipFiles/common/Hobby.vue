@@ -61,11 +61,9 @@ export default {
         category: 1,
         content: specialtyContent
       });
-      console.log(hobbyDataForAdmin)
+      // console.log(hobbyDataForAdmin)
       this.$http
-        .post("/add_hobbyandspeciaty/" + this.vipId, {
-          hobbySpecialty: hobbyDataForAdmin
-        })
+        .post("/add_hobbyandspeciaty/" + this.vipId, hobbyDataForAdmin)
         .then(res => {
           this.$Message.success("操作成功!");
         })
@@ -81,14 +79,13 @@ export default {
           let resData = res.data.hobbySpecialtys;
           let resDataHobby, resDataSpecialty;
           resData.forEach(element => {
-            if (element.category == 1) {
-              let hobbyArr = element.content.split(",");
+            if (element.category == 2) {
+              let hobbyArr = element.content.split("|");
               hobbyArr.forEach(h => {
                 if (h === "散步" || h === "爬山" || h === "戏曲") {
                   this.HobbyData.hobby.push(h);
                 } else {
-                  this.HobbyData.otherHobby =
-                    this.HobbyData.otherHobby + "|" + h;
+                  this.HobbyData.otherHobby = h;
                 }
               });
             } else {

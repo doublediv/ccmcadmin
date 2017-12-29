@@ -660,7 +660,7 @@ export default {
           content: "<p>该用户积分不足！</p>"
         });
       } else {
-        var orderGoodsDataForAdmin = this.addGoodsData.map(e => {
+        let orderGoodsDataForAdmin = this.addGoodsData.map(e => {
           return {
             customerId: this.vipData.customerId,
             paidScore: e.score,
@@ -671,7 +671,7 @@ export default {
           };
         });
 
-        var orderServiceDataForAdmin = this.addServiceData.map(e => {
+        let orderServiceDataForAdmin = this.addServiceData.map(e => {
           return {
             customerId: this.vipData.customerId,
             paidScore: e.score,
@@ -682,7 +682,7 @@ export default {
           };
         });
 
-        var exchangeOrder = orderGoodsDataForAdmin.concat(
+        let exchangeOrder = orderGoodsDataForAdmin.concat(
           orderServiceDataForAdmin
         );
         orderGoodsDataForAdmin = orderServiceDataForAdmin = null;
@@ -691,7 +691,7 @@ export default {
 
         this.isKeep = true;
         this.$http
-          .post("/exchange_score_list", exchangeOrder)
+          .post("/exchange_score", exchangeOrder)
           .then(res => {
             this.getGoodsData(this.searchGoodsData);
             this.getServiceData(this.searchGoodsData);

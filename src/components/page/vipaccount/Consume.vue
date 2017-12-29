@@ -300,33 +300,32 @@ export default {
     },
     // 获取数据
     getData(jsonData) {
-      const _this = this;
       this.tableData = [];
       this.$http
         .post("/get_product", jsonData)
-        .then(function(res) {
+        .then(res => {
           //   console.log(res);
-          _this.tableData = res.data.product;
-          if (_this.isSearch) {
-            if (_this.tableData.length > 0 && _this.tableData.length < 2) {
-              _this.preSelection(res.data.product[0]);
+          this.tableData = res.data.product;
+          if (this.isSearch) {
+            if (this.tableData.length > 0 && this.tableData.length < 2) {
+              this.preSelection(res.data.product[0]);
             }
-            _this.isSearch = false;
+            this.isSearch = false;
           }
           //   分页
-          _this.totalPage = res.data.paginator.totalCount;
+          this.totalPage = res.data.paginator.totalCount;
           if (res.data.paginator.totalPages > 1) {
-            _this.isPage = true;
+            this.isPage = true;
           } else {
-            _this.isPage = false;
+            this.isPage = false;
           }
         })
-        .catch(function(err) {
+        .catch(err => {
           console.log(err);
-          _this.$refs.vTable.$emit("getErr");
-          _this.$Notice.error({ title: "商品获取失败！" });
-          if (_this.isSearch) {
-            _this.isSearch = false;
+          this.$refs.vTable.$emit("getErr");
+          this.$Notice.error({ title: "商品获取失败！" });
+          if (this.isSearch) {
+            this.isSearch = false;
           }
         });
     },
@@ -425,7 +424,6 @@ export default {
           .post("/add_product_order", orderDataForAdmin)
           .then(res => {
             this.getData(this.searchData);
-            this.addGoodsData = [];
             this.orderData.totalConsumption = 0;
             this.orderData.afterDiscount = 0;
             this.isKeep = false;

@@ -190,6 +190,7 @@ export default {
           this.addGoodsData = [];
           this.isKeep = false;
           this.$Message.success("商品入库成功！");
+          this.getData(this.searchData);
         })
         .catch(err => {
           console.log(err);

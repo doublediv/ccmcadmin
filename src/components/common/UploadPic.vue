@@ -26,10 +26,11 @@
                 :on-error="uploadError"
                 :on-success="uploadSuccess"
                 :data="fileType"
-                action="http://192.168.1.149:8080/ccmc/upload_avatar">
+                action="http://dxccmc.com/ccmc/upload_avatar">
                 <Icon type="image" size="20"></Icon>
             </Upload>
         </div>
+        <!-- http://192.168.1.149:8080/ccmc -->
         <Modal class-name="bigPic" width="360" title="查看图片" v-model="isView">
             <img :src="getFatherPicUrl" alt="" />
         </Modal>
