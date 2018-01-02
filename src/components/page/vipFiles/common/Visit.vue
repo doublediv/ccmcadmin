@@ -14,7 +14,7 @@
                 <Input type="text" v-model="visitData.name" placeholder="请输入姓名"></Input>
             </FormItem>
             <FormItem label="就诊时间:">
-                <DatePicker type="date" v-model="visitData.treatmentTime" placeholder="请选择就诊时间" style="width: 100%"></DatePicker>
+                <DatePicker type="date" :value="visitData.treatmentTime"  @on-change="setTreatDate" placeholder="请选择就诊时间" style="width: 100%"></DatePicker>
             </FormItem>
             <FormItem label="就诊科室:">
                 <Input type="text" v-model="visitData.department" placeholder="请输入就诊科室"></Input>
@@ -23,7 +23,7 @@
                 <Input type="text" v-model="visitData.doctor" placeholder="请输入医生姓名"></Input>
             </FormItem>
             <FormItem label="复诊时间:">
-                <DatePicker type="date" v-model="visitData.visitTime" placeholder="请选择就诊时间" style="width: 100%"></DatePicker>
+                <DatePicker type="date" :value="visitData.visitTime" @on-change="setVisitDate" placeholder="请选择就诊时间" style="width: 100%"></DatePicker>
             </FormItem>
         </Form>
         <div slot="footer" class="button-box">
@@ -150,6 +150,14 @@ export default {
     showVisit() {
       this.isAddShow = true;
       this.editFormTitle = "新增就诊记录";
+    },
+    // 设置就诊时间
+    setTreatDate(date) {
+      this.visitData.treatmentTime = date;
+    },
+    // 设置复诊时间
+    setVisitDate(date) {
+      this.visitData.visitTime = date;
     },
     // 取消弹窗
     cancel(refName, showName) {

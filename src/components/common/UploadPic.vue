@@ -51,7 +51,7 @@ export default {
   },
   computed: {
     getFatherPicUrl() {
-      console.log(this.fatherPicUrl)
+      // console.log(this.fatherPicUrl)
       let imgReg = /[.jpg|.png|.jpeg]$/;
       if (imgReg.test(this.fatherPicUrl)) {
         this.havePic = true;

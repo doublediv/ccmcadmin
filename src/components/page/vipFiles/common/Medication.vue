@@ -14,7 +14,7 @@
                 <Input type="text" v-model="medicationData.medicationName" placeholder="请输入药名"></Input>
             </FormItem>
             <FormItem label="服药日期:">
-                <DatePicker type="date" v-model="medicationData.medicationDate" placeholder="请选择服药日期" style="width: 100%"></DatePicker>
+                <DatePicker type="date" :value="medicationData.medicationDate" format="yyyy-MM-dd" @on-change="setDate" placeholder="请选择服药日期" style="width: 100%"></DatePicker>
             </FormItem>
             <FormItem label="使用方法:">
                 <Select v-model="medicationData.way" placeholder="请选择使用方法" style="width: 105px">
@@ -23,9 +23,9 @@
                 </Select>
                 <Input type="text" v-model="medicationData.num" placeholder="请输入数字" style="width: 83px"></Input>
                 <Select v-model="medicationData.cycle" placeholder="请选择使用周期" style="width: 105px">
-                    <Option value=" 次/天 ">次/天</Option>
-                    <Option value=" 次/周 ">次/天</Option>
-                    <Option value=" 次/月 ">次/月</Option>
+                    <Option value="次/天">次/天</Option>
+                    <Option value="次/周">次/周</Option>
+                    <Option value="次/月">次/月</Option>
                 </Select>
             </FormItem>
             <FormItem label="用药剂量:">
@@ -178,6 +178,10 @@ export default {
     showMedication() {
       this.isAddShow = true;
       this.editFormTitle = "新增用药记录";
+    },
+    // 设置时间
+    setDate(date) {
+      this.medicationData.medicationDate = date;
     },
     // 取消弹窗
     cancel(refName, showName) {

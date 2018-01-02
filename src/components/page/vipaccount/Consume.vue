@@ -230,7 +230,8 @@ export default {
         afterDiscount: 0,
         seller: ""
       },
-      isKeep: false
+      isKeep: false,
+      orderDataForAdmin: []
     };
   },
   mounted() {
@@ -304,7 +305,7 @@ export default {
       this.$http
         .post("/get_product", jsonData)
         .then(res => {
-          //   console.log(res);
+          // console.log(3,res);
           this.tableData = res.data.product;
           if (this.isSearch) {
             if (this.tableData.length > 0 && this.tableData.length < 2) {
@@ -409,7 +410,7 @@ export default {
       } else {
         //   console.log(this.addGoodsData);
 
-        var orderDataForAdmin = this.addGoodsData.map(e => {
+        let orderDataForAdmin = this.addGoodsData.map(e => {
           return {
             customerId: this.vipData.customerId,
             productId: e.productId,
@@ -420,15 +421,23 @@ export default {
 
         //   console.log(orderDataForAdmin);
         this.isKeep = true;
+        // 用并发请求来改变请求头content-type
         this.$http
-          .post("/add_product_order", orderDataForAdmin)
-          .then(res => {
-            this.getData(this.searchData);
-            this.orderData.totalConsumption = 0;
-            this.orderData.afterDiscount = 0;
-            this.isKeep = false;
-            this.$Message.success("订单提交成功！");
-          })
+          .all([this.$http.post("/add_product_order", orderDataForAdmin), this.$http.post("/get_product", this.searchData)])
+          .then(
+            this.$http.spread((acct, perms) => {
+              // 两个请求现在都执行完成
+              // console.log(acct, perms);
+              this.orderData.totalConsumption = 0;
+              this.orderData.afterDiscount = 0;
+              this.isKeep = false;
+              this.addGoodsData = [];
+              this.$Message.success("订单提交成功！");
+              // 更新数据
+              this.searchVip()
+              this.getData(this.searchData);
+            })
+          )
           .catch(err => {
             console.log(err);
             this.isKeep = false;

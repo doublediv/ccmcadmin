@@ -182,16 +182,25 @@ export default {
           count: e.count
         };
       });
-    //   console.log(addGoodsDataForAdmin);
+      //   console.log(addGoodsDataForAdmin);
       this.isKeep = true;
+      // 用并发请求来改变请求头content-type
       this.$http
-        .post("/add_product_stock", addGoodsDataForAdmin)
-        .then(res => {
-          this.addGoodsData = [];
-          this.isKeep = false;
-          this.$Message.success("商品入库成功！");
-          this.getData(this.searchData);
-        })
+        .all([
+          this.$http.post("/add_product_stock", addGoodsDataForAdmin),
+          this.$http.post("/get_product", this.searchData)
+        ])
+        .then(
+          this.$http.spread((acct, perms) => {
+            // 两个请求现在都执行完成
+            // console.log(acct, perms);
+            this.addGoodsData = [];
+            this.isKeep = false;
+            this.$Message.success("商品入库成功！");
+            // 更新数据
+            this.getData(this.searchData);
+          })
+        )
         .catch(err => {
           console.log(err);
           this.isKeep = false;

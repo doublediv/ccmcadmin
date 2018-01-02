@@ -3,8 +3,8 @@ import qs from 'qs'
 
 
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8';           //配置请求头
-axios.defaults.baseURL = 'http://192.168.1.149:8080/ccmc';
-// axios.defaults.baseURL = 'http://dxccmc.com/ccmc';
+// axios.defaults.baseURL = 'http://192.168.1.149:8080/ccmc';
+axios.defaults.baseURL = 'http://dxccmc.com/ccmc';
 axios.defaults.timeout = 5000;
 // 让每个请求携带token--['token']为自定义key
 // axios.defaults.headers.common['Authorization'] = '5188c5187d48df67b0c8953813791f25ed4e367c'
@@ -33,6 +33,7 @@ axios.interceptors.response.use(
         if (response.data.status === 2005) {
             localStorage.clear();
             location.href = "./";
+            alert("登录已超时，请重新登录！")
         }
         return response
     }, error => {

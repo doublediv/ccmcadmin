@@ -690,17 +690,26 @@ export default {
         // console.log(exchangeOrder)
 
         this.isKeep = true;
+        // 用并发请求来改变请求头content-type
         this.$http
-          .post("/exchange_score", exchangeOrder)
-          .then(res => {
-            this.getGoodsData(this.searchGoodsData);
-            this.getServiceData(this.searchGoodsData);
-            this.addGoodsData = [];
-            this.addServiceData = [];
-            this.orderData.totalConsumption = 0;
-            this.isKeep = false;
-            this.$Message.success("订单提交成功！");
-          })
+          .all([
+            this.$http.post("/exchange_score", exchangeOrder),
+            this.$http.post("/get_product", this.searchGoodsData)
+          ])
+          .then(
+            this.$http.spread((acct, perms) => {
+              // 两个请求现在都执行完成
+              // console.log(acct, perms);
+              this.addGoodsData = [];
+              this.addServiceData = [];
+              this.orderData.totalConsumption = 0;
+              this.isKeep = false;
+              this.$Message.success("订单提交成功！");
+              // 更新数据
+              this.getGoodsData(this.searchGoodsData);
+              this.searchVip()
+            })
+          )
           .catch(err => {
             console.log(err);
             this.isKeep = false;
