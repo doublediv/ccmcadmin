@@ -14,7 +14,10 @@
             <Input disabled v-model="servConData.creater"></Input>
         </FormItem>
         <FormItem label="会员联系电话:" prop="phone">
-            <Input v-model="servConData.phone" placeholder="请输入会员联系电话"></Input>
+            <Input disabled v-model="servConData.phone" placeholder="请搜索相关会员或输入会员联系电话"></Input>
+        </FormItem>
+        <FormItem label="会员卡余额:">
+            <Input disabled v-model="servConData.balance" placeholder="请搜索相关会员"></Input>
         </FormItem>
         <FormItem label="消费时间:" prop="paidTime">
             <DatePicker v-model="servConData.paidTime" @on-change="setDate" type="datetime" placeholder="请选择消费时间" style="width: 100%"></DatePicker>
@@ -56,9 +59,47 @@
         </FormItem>
         <div class="buttonbox">
             <Button :loading="isKeep" type="primary" @click="keepConsume('servConForm')">提交</Button>
+            <Button :disabled="isRefNo" type="primary" @click="showPrint(refNo)">打印小票</Button>
             <!-- <Button type="ghost" @click="resetConsume('servConForm')">重置</Button> -->
         </div>
     </Form>
+    <!-- 打印小票 -->
+    <Modal 
+        v-model="isPrint"
+        :closable="false"
+        :mask-closable="false"
+        :width="320"
+        class-name="eidthform">
+        <p slot="header">小票信息</p>
+        <div style="font-size: 14px; line-height: 28px;" id="receipt">
+          <h3 style="font-size: 16px; text-align: center; margin-bottom: 10px; font-weight: 700">CCMC-{{printData.companyName}}</h3>
+          <hr style="height: 2px; border: none; border-top: 2px dashed #333; margin: 10px 0" />
+          <p>{{printData.createTime}}</p>
+          <p>No.{{refNo}}</p>
+          <hr style="height: 2px; border: none; border-top: 2px dashed #333; margin: 10px 0" />
+          <p><span>服务项目：</span><span>{{printData.serviceProjectName}}</span></p>
+          <p><span>服务提供：</span><span>{{printData.type}}</span></p>
+          <p><span>服务人员：</span><span>{{printData.serviceUser}}</span></p>
+          <p><span>服务价格：</span><span>{{printData.price}} 元 / {{printData.costType}}</span></p>
+          <p><span>服务数量：</span><span>{{printData.quantity}} {{printData.costType}}</span></p>
+          <p><span>服务时间：</span><span>{{printData.serviceTime}}</span></p>
+          <hr style="height: 2px; border: none; border-top: 2px dashed #333; margin: 10px 0" />
+          <p>
+            <span style="display: inline-block; width: 48%; text-align: center">消费金额</span>
+            <span style="display: inline-block; width: 48%; text-align: center">获得积分</span>
+          </p>
+          <p>
+            <span style="display: inline-block; width: 48%; text-align: center">{{printData.paidPrice}}</span>
+            <span style="display: inline-block; width: 48%; text-align: center">{{printData.generateScore}}</span>
+          </p>
+          <hr style="height: 2px; border: none; border-top: 2px dashed #333; margin: 10px 0" />
+          <p style="text-align: center; font-size: 16px; margin: 10px 0 24px">谢谢惠顾</p>
+        </div>
+        <div slot="footer" class="button-box">
+            <Button type="primary" :loading="isKeep"  @click="print('receipt')">打印</Button>
+            <Button type="ghost" @click="closePrint">关闭</Button>
+        </div>
+    </Modal> 
   </div>
 </template>
 <script>
@@ -88,13 +129,14 @@ export default {
       servConData: {
         creater: "",
         phone: "",
+        balance: "",
         paidTime: "",
         serviceProjectId: "",
         serviceType: "",
         serviceId: "",
         price: "",
         feeScale: "",
-        quantity: "0",
+        quantity: "",
         totalMoney: "0",
         obtainIntegral: "0"
       },
@@ -106,11 +148,26 @@ export default {
         serviceId: [{ required: true, message: "请选服务人员" }],
         quantity: [{ required: true, message: "请输入消费数量" }],
         feeScale: [{ required: true, message: "请选服务人员" }],
-        totalMoney: [{ required: true, message: "请输入消费总金额" }],
-        obtainIntegral: [{ required: true, message: "请输入消费获得积分" }]
+        totalMoney: [{ required: true, message: "请输入消费数量" }],
+        obtainIntegral: [{ required: true, message: "请输入消费数量" }]
       },
-
-      isKeep: false
+      isKeep: false,
+      isRefNo: true,
+      isPrint: false,
+      refNo: "",
+      printData: {
+        companyName: "",
+        createTime: "",
+        serviceProjectName: "",
+        type: "",
+        serviceUser: "",
+        price: "",
+        costType: "",
+        quantity: "",
+        serviceTime: "",
+        paidPrice: "",
+        generateScore: ""
+      }
     };
   },
   created() {
@@ -153,6 +210,7 @@ export default {
 
             default:
               this.servConData.phone = res.data.vipcustomer.tel;
+              this.servConData.balance = res.data.vipcustomer.totalDeposits;
               break;
           }
           this.isSearchVip = false;
@@ -197,12 +255,15 @@ export default {
     // 获取服务项目价格
     getServicePrice(serviceId) {
       this.servConData.feeScale = "";
+      this.servConData.quantity = "";
+      this.servConData.totalMoney = "0";
+      this.servConData.obtainIntegral = "0";
       this.$http
         .post("/get_service_project_pay", { serviceProjectId: serviceId })
         .then(res => {
           //   console.log(res);
           this.servConData.feeScale =
-            res.data.price + " / " + res.data.costType;
+            res.data.price + " 元 / " + res.data.costType;
           this.servConData.price = res.data.price;
         })
         .catch(err => {
@@ -264,29 +325,77 @@ export default {
     keepConsume(refName) {
       this.$refs[refName].validate(valid => {
         if (valid) {
-          this.isKeep = true;
-          this.$http
-            .post("/add_service_order", {
-              serviceProjectId: this.servConData.serviceProjectId,
-              phone: this.servConData.phone,
-              paidTime: this.servConData.paidTime,
-              serviceId: this.servConData.serviceId,
-              serviceType: this.servConData.serviceType,
-              quantity: this.servConData.quantity
-            })
-            .then(res => {
-              // console.log(res);
-              this.isKeep = false;
-              // this.$refs[refName].resetFields();
-              this.$Message.success("服务消费添加成功！");
-            })
-            .catch(err => {
-              this.isKeep = false;
-              console.log(err);
-              this.$Notice.error({ title: "服务消费添加失败！" });
-            });
+          if (this.servConData.balance < this.servConData.totalMoney) {
+            this.$Notice.error({ title: "该会员余额不足，请充值！" });
+          } else {
+            this.isKeep = true;
+            this.$http
+              .post("/add_service_order", {
+                serviceProjectId: this.servConData.serviceProjectId,
+                phone: this.servConData.phone,
+                paidTime: this.servConData.paidTime,
+                serviceId: this.servConData.serviceId,
+                serviceType: this.servConData.serviceType,
+                quantity: this.servConData.quantity
+              })
+              .then(res => {
+                // console.log(res);
+                this.$Message.success("服务消费添加成功！");
+                this.refNo = res.data.refNo;
+                this.isRefNo = false;
+                this.isKeep = false;
+              })
+              .catch(err => {
+                this.isKeep = false;
+                console.log(err);
+                this.$Notice.error({ title: "服务消费添加失败！" });
+              });
+          }
         }
       });
+    },
+    // 显示小票信息
+    showPrint() {
+      this.$http
+        .post("/service_print", { refNo: this.refNo })
+        .then(res => {
+          // console.log(res);
+          this.printData = res.data.servicePrint;
+          switch (this.printData.costType) {
+            case 1:
+              this.printData.costType = "天";
+              break;
+            case 2:
+              this.printData.costType = "次";
+              break;
+            case 3:
+              this.printData.costType = "小时";
+              break;
+
+            default:
+              break;
+          }
+          this.printData.createTime = this.$layout.formatDate(
+            this.printData.createTime
+          );
+          this.printData.serviceTime = this.$layout.formatDate(
+            this.printData.serviceTime
+          );
+          this.isPrint = true;
+        })
+        .catch(err => {
+          console.log(err);
+          this.$Notice.error({ title: "小票信息获取失败！" });
+        });
+    },
+    // 打印小票
+    print(id) {
+      this.$layout.print(id);
+    },
+
+    // 关闭打印小票
+    closePrint() {
+      this.isPrint = false;
     }
   }
 };

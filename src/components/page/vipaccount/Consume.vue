@@ -1,70 +1,108 @@
 <template>
-  <Row :gutter="24">
-    <Col span="10">
-        <Form :model="searchVipData" inline :label-width="80">
-            <FormItem label="会员搜索:">
-                <Input type="text" v-model="searchVipData.content" placeholder="请读取卡号或输入手机号"></Input>
-            </FormItem>
-            <Button class="singlebutton" type="primary" @click="linkDevice">连接设备</Button>
-            <Button class="singlebutton" type="primary" @click="toFindTheCard">双击读卡</Button>
-            <Button class="singlebutton" icon="ios-search" :loading="isSearchVip" type="primary" @click="searchVip">搜索</Button>
-        </Form>
-        <Form :model="vipData" inline :label-width="82">
-            <FormItem label="姓名:">
-                <Input disabled type="text" v-model="vipData.realName" placeholder="请先搜索相关会员"></Input>
-            </FormItem>
-            <FormItem label="会员级别:">
-                <Input disabled type="text" v-model="vipData.viplevel" placeholder="请先搜索相关会员"></Input>
-            </FormItem>
-            <FormItem label="账户余额:">
-                <Input disabled type="text" v-model="vipData.totalDeposits" placeholder="请先搜索相关会员"></Input>
-            </FormItem>
-            <FormItem label="积分:">
-                <Input disabled type="text" v-model="vipData.score" placeholder="请先搜索相关会员"></Input>
-            </FormItem>
-        </Form>
-        <p class="tip">请选择要购买的商品</p>
-        <Form :model="searchData" inline :label-width="70">
-            <FormItem label="商品编码:">
-                <Input type="text" v-model="searchData.productNo" placeholder="按商品编码搜索" @on-enter="search"></Input>
-            </FormItem>
-            <Button class="singlebutton" icon="ios-search" :loading="isSearch" type="primary" @click="search">搜索</Button>
-        </Form>
-        <v-table ref="vTable" :tableColumns="tableColumns" :tableData="tableData" @getRow="preSelection" :totalPage="totalPage" :isPage="isPage" @getPage="selectPage"></v-table>
-    </Col>
-    <Col span="14">
-        <p class="tip">准备购买的商品</p>
-        <Table ref="addTable" :columns="addGoodsColumns" :data="addGoodsData" height="400" border></Table>
-        <p class="tip">&nbsp;</p>
-        <p class="tip">订单信息</p>
-        <Form :model="orderData" inline :label-width="90">
-            <Row>
-              <Col span="24">
-                <FormItem label="消费总金额:">
-                    <Input disabled type="text" v-model="orderData.totalConsumption"></Input>
-                </FormItem>
-                <FormItem label="折后总金额:">
-                    <Input disabled type="text" v-model="orderData.afterDiscount"></Input>
-                </FormItem>
-              </Col>
-              <Col span="24">
-                <FormItem label="所得积分总额:">
-                    <Input disabled type="text" v-model="orderData.afterDiscount"></Input>
-                </FormItem>
-                <FormItem label="销售人员:">
-                    <Input type="text" v-model="orderData.seller" placeholder="请输入销售人员"></Input>
-                </FormItem>
-              </Col>
-              <Col span="24">
-                <FormItem>
-                    <Button class="singlebutton" :loading="isKeep" type="primary" @click="buyGoods">确定购买</Button>
-                    <Button class="singlebutton" type="ghost" @click="cancelBuy">取消购买</Button>
-                </FormItem>
-              </Col>
-            </Row>
-        </Form>
-    </Col>
-  </Row>
+  <div>
+    <Row :gutter="24">
+      <Col span="10">
+          <Form :model="searchVipData" inline :label-width="80">
+              <FormItem label="会员搜索:">
+                  <Input type="text" v-model="searchVipData.content" placeholder="请读取卡号或输入手机号"></Input>
+              </FormItem>
+              <Button class="singlebutton" type="primary" @click="linkDevice">连接设备</Button>
+              <Button class="singlebutton" type="primary" @click="toFindTheCard">双击读卡</Button>
+              <Button class="singlebutton" icon="ios-search" :loading="isSearchVip" type="primary" @click="searchVip">搜索</Button>
+          </Form>
+          <Form :model="vipData" inline :label-width="82">
+              <FormItem label="姓名:">
+                  <Input disabled type="text" v-model="vipData.realName" placeholder="请先搜索相关会员"></Input>
+              </FormItem>
+              <FormItem label="会员级别:">
+                  <Input disabled type="text" v-model="vipData.viplevel" placeholder="请先搜索相关会员"></Input>
+              </FormItem>
+              <FormItem label="账户余额:">
+                  <Input disabled type="text" v-model="vipData.totalDeposits" placeholder="请先搜索相关会员"></Input>
+              </FormItem>
+              <FormItem label="积分:">
+                  <Input disabled type="text" v-model="vipData.score" placeholder="请先搜索相关会员"></Input>
+              </FormItem>
+          </Form>
+          <p class="tip">请选择要购买的商品</p>
+          <Form :model="searchData" inline :label-width="70">
+              <FormItem label="商品编码:">
+                  <Input type="text" v-model="searchData.productNo" placeholder="按商品编码搜索" @on-enter="search"></Input>
+              </FormItem>
+              <Button class="singlebutton" icon="ios-search" :loading="isSearch" type="primary" @click="search">搜索</Button>
+          </Form>
+          <v-table ref="vTable" :tableColumns="tableColumns" :tableData="tableData" @getRow="preSelection" :totalPage="totalPage" :isPage="isPage" @getPage="selectPage"></v-table>
+      </Col>
+      <Col span="14">
+          <p class="tip">准备购买的商品</p>
+          <Table ref="addTable" :columns="addGoodsColumns" :data="addGoodsData" height="400" border></Table>
+          <p class="tip">&nbsp;</p>
+          <p class="tip">订单信息</p>
+          <Form :model="orderData" inline :label-width="90">
+              <Row>
+                <Col span="24">
+                  <FormItem label="消费总金额:">
+                      <Input disabled type="text" v-model="orderData.totalConsumption"></Input>
+                  </FormItem>
+                  <FormItem label="折后总金额:">
+                      <Input disabled type="text" v-model="orderData.afterDiscount"></Input>
+                  </FormItem>
+                </Col>
+                <Col span="24">
+                  <FormItem label="所得积分总额:">
+                      <Input disabled type="text" v-model="orderData.afterDiscount"></Input>
+                  </FormItem>
+                  <FormItem label="销售人员:">
+                      <Input type="text" v-model="orderData.seller" placeholder="请输入销售人员"></Input>
+                  </FormItem>
+                </Col>
+                <Col span="24">
+                  <FormItem>
+                      <Button class="singlebutton" :loading="isKeep" type="primary" @click="buyGoods">确定购买</Button>
+                      <Button class="singlebutton" type="ghost" @click="cancelBuy">取消购买</Button>
+                      <Button class="singlebutton" :disabled="isRefNo" type="primary" @click="showPrint(refNo)">打印小票</Button>
+                  </FormItem>
+                </Col>
+              </Row>
+          </Form>
+      </Col>
+    </Row>
+    <!-- 打印小票 -->
+    <Modal 
+        v-model="isPrint"
+        :closable="false"
+        :mask-closable="false"
+        :width="350"
+        class-name="eidthform">
+        <p slot="header">小票信息</p>
+        <div style="font-size: 14px; line-height: 28px;" id="receipt">
+          <h3 style="font-size: 16px; text-align: center; margin-bottom: 10px; font-weight: 700">CCMC-康养驿站</h3>
+          <hr style="height: 2px; border: none; border-top: 2px dashed #333; margin: 10px 0" />
+          <p>No.{{refNo}}</p>
+          <hr style="height: 2px; border: none; border-top: 2px dashed #333; margin: 10px 0" />
+          <p>
+            <span style="display: inline-block; width: 24%; text-align: center">兑换项目</span>
+            <span style="display: inline-block; width: 24%; text-align: center">兑换类型</span>
+            <span style="display: inline-block; width: 24%; text-align: center">数量</span>
+            <span style="display: inline-block; width: 24%; text-align: center">所需积分</span>
+          </p>
+          <p v-for="item in printData" :key="item.id">
+            <span style="display: inline-block; width: 24%; text-align: center">{{item.name}}</span>
+            <span style="display: inline-block; width: 24%; text-align: center">{{item.exchangeType}}</span>
+            <span style="display: inline-block; width: 24%; text-align: center">{{item.quantity}}</span>
+            <span style="display: inline-block; width: 24%; text-align: center">{{item.paidScore}}</span>
+          </p>
+          <hr style="height: 2px; border: none; border-top: 2px dashed #333; margin: 10px 0" />
+          <p style="text-align: right; margin-right: 20px">总消费积分：{{this.totalPaidScore}}</p>
+          <hr style="height: 2px; border: none; border-top: 2px dashed #333; margin: 10px 0" />
+          <p style="text-align: center; font-size: 16px; margin: 10px 0 24px">谢谢惠顾</p>
+        </div>
+        <div slot="footer" class="button-box">
+            <Button type="primary" :loading="isKeep"  @click="print('receipt')">打印</Button>
+            <Button type="ghost" @click="closePrint">关闭</Button>
+        </div>
+    </Modal> 
+  </div>
 </template>
 <script>
 import vTable from "../../common/Table.vue";
@@ -231,7 +269,12 @@ export default {
         seller: ""
       },
       isKeep: false,
-      orderDataForAdmin: []
+      orderDataForAdmin: [],
+      isRefNo: true,
+      refNo: "SP1513134504929",
+      isPrint: false,
+      totalPaidScore: "",
+      printData: []
     };
   },
   mounted() {
@@ -433,6 +476,8 @@ export default {
               this.isKeep = false;
               this.addGoodsData = [];
               this.$Message.success("订单提交成功！");
+              this.refNo = res.data.refNo;
+              this.isRefNo = false;
               // 更新数据
               this.searchVip()
               this.getData(this.searchData);
@@ -444,6 +489,30 @@ export default {
             this.$Notice.error({ title: "订单提交失败！" });
           });
       }
+    },
+    // 显示小票信息
+    showPrint() {
+      this.$http
+        .post("/product_print", { refNo: this.refNo })
+        .then(res => {
+          console.log(res);
+          // this.printData = res.data.exchangePrint.data;
+          // this.totalPaidScore = res.data.exchangePrint.totalPaidScore;
+          // this.isPrint = true;
+        })
+        .catch(err => {
+          console.log(err);
+          this.$Notice.error({ title: "小票信息获取失败！" });
+        });
+    },
+    // 打印小票
+    print(id) {
+      this.$layout.print(id);
+    },
+
+    // 关闭打印小票
+    closePrint() {
+      this.isPrint = false;
     }
   }
 };

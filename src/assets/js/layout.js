@@ -56,7 +56,43 @@ export default {
     // 找卡
     toFindTheCard() {
         obj.findcardStr(icdev, 0);//1);     //1: multy card mode
+    },
+    // 个位数加0
+    add0(num) {
+        return num < 10 ? '0' + num : num;
+    },
+    // 时间戳转日期
+    formatDate(time) {
+        let iTime = new Date(time)
+        let year = iTime.getFullYear();
+        let month = iTime.getMonth() + 1;
+        let date = iTime.getDate();
+        let hour = iTime.getHours();
+        let minute = iTime.getMinutes();
+        let second = iTime.getSeconds();
+
+        return year + '-' + this.add0(month) + '-' + this.add0(date) + ' ' + this.add0(hour) + ':' + this.add0(minute) + ':' + this.add0(second);
+    },
+    
+    // 打印
+    print(id) {
+        let printHtml = document.getElementById(id).innerHTML;
+        let iframe = document.createElement("IFRAME");
+        let doc = null;
+        // iframe.setAttribute(
+        //     "style",
+        //     "position: absolute; width: 0px; height:0px; left: -500px; top: -500px;"
+        // );
+        document.body.appendChild(iframe);
+        doc = iframe.contentWindow.document;
+        doc.write("<div class='print-box'>"+ printHtml +"</div>");
+        doc.close();
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+        document.body.removeChild(iframe);
     }
+
+    
 
 
 
