@@ -76,24 +76,38 @@
         class-name="eidthform">
         <p slot="header">小票信息</p>
         <div style="font-size: 14px; line-height: 28px;" id="receipt">
-          <h3 style="font-size: 16px; text-align: center; margin-bottom: 10px; font-weight: 700">CCMC-康养驿站</h3>
+          <h3 style="font-size: 16px; text-align: center; margin-bottom: 10px; font-weight: 700">CCMC-{{printData.companyName}}</h3>
           <hr style="height: 2px; border: none; border-top: 2px dashed #333; margin: 10px 0" />
           <p>No.{{refNo}}</p>
+          <p>{{printData.createTime}}</p>
           <hr style="height: 2px; border: none; border-top: 2px dashed #333; margin: 10px 0" />
           <p>
-            <span style="display: inline-block; width: 24%; text-align: center">兑换项目</span>
-            <span style="display: inline-block; width: 24%; text-align: center">兑换类型</span>
-            <span style="display: inline-block; width: 24%; text-align: center">数量</span>
-            <span style="display: inline-block; width: 24%; text-align: center">所需积分</span>
+            <span style="display: inline-block; width: 19%; text-align: center">商品名</span>
+            <span style="display: inline-block; width: 19%; text-align: center">单价</span>
+            <span style="display: inline-block; width: 19%; text-align: center">数量</span>
+            <span style="display: inline-block; width: 19%; text-align: center">优惠</span>
+            <span style="display: inline-block; width: 19%; text-align: center">小计</span>
           </p>
-          <p v-for="item in printData" :key="item.id">
-            <span style="display: inline-block; width: 24%; text-align: center">{{item.name}}</span>
-            <span style="display: inline-block; width: 24%; text-align: center">{{item.exchangeType}}</span>
-            <span style="display: inline-block; width: 24%; text-align: center">{{item.quantity}}</span>
-            <span style="display: inline-block; width: 24%; text-align: center">{{item.paidScore}}</span>
+          <p v-for="(item, index) in printData.date" :key="index">
+            <span style="display: inline-block; width: 19%; text-align: center">{{item.productName}}</span>
+            <span style="display: inline-block; width: 19%; text-align: center">{{item.original_price}}</span>
+            <span style="display: inline-block; width: 19%; text-align: center">{{item.quantity}}</span>
+            <span style="display: inline-block; width: 19%; text-align: center">{{item.cut_price}}</span>
+            <span style="display: inline-block; width: 19%; text-align: center">{{item.discount_price}}</span>
           </p>
           <hr style="height: 2px; border: none; border-top: 2px dashed #333; margin: 10px 0" />
-          <p style="text-align: right; margin-right: 20px">总消费积分：{{this.totalPaidScore}}</p>
+          <p>
+            <span style="display: inline-block; width: 24%; text-align: center">总计</span>
+            <span style="display: inline-block; width: 24%; text-align: center">优惠</span>
+            <span style="display: inline-block; width: 24%; text-align: center">应收</span>
+            <span style="display: inline-block; width: 24%; text-align: center">获得积分</span>
+          </p>
+          <p>
+            <span style="display: inline-block; width: 24%; text-align: center">{{printData.totalPrice}}</span>
+            <span style="display: inline-block; width: 24%; text-align: center">{{printData.cutPrice}}</span>
+            <span style="display: inline-block; width: 24%; text-align: center">{{printData.discountPrice}}</span>
+            <span style="display: inline-block; width: 24%; text-align: center">{{printData.generateScore}}</span>
+          </p>
           <hr style="height: 2px; border: none; border-top: 2px dashed #333; margin: 10px 0" />
           <p style="text-align: center; font-size: 16px; margin: 10px 0 24px">谢谢惠顾</p>
         </div>
@@ -271,10 +285,17 @@ export default {
       isKeep: false,
       orderDataForAdmin: [],
       isRefNo: true,
-      refNo: "SP1513134504929",
+      refNo: "",
       isPrint: false,
-      totalPaidScore: "",
-      printData: []
+      printData: {
+        totalPrice: "",
+        discountPrice: "",
+        generateScore: "",
+        companyName: "",
+        createTime: "",
+        cutPrice: "",
+        date: []
+      }
     };
   },
   mounted() {
@@ -466,7 +487,10 @@ export default {
         this.isKeep = true;
         // 用并发请求来改变请求头content-type
         this.$http
-          .all([this.$http.post("/add_product_order", orderDataForAdmin), this.$http.post("/get_product", this.searchData)])
+          .all([
+            this.$http.post("/add_product_order", orderDataForAdmin),
+            this.$http.post("/get_product", this.searchData)
+          ])
           .then(
             this.$http.spread((acct, perms) => {
               // 两个请求现在都执行完成
@@ -476,10 +500,10 @@ export default {
               this.isKeep = false;
               this.addGoodsData = [];
               this.$Message.success("订单提交成功！");
-              this.refNo = res.data.refNo;
+              this.refNo = acct.data.refNo;
               this.isRefNo = false;
               // 更新数据
-              this.searchVip()
+              this.searchVip();
               this.getData(this.searchData);
             })
           )
@@ -495,10 +519,12 @@ export default {
       this.$http
         .post("/product_print", { refNo: this.refNo })
         .then(res => {
-          console.log(res);
-          // this.printData = res.data.exchangePrint.data;
-          // this.totalPaidScore = res.data.exchangePrint.totalPaidScore;
-          // this.isPrint = true;
+          // console.log(res);
+          this.printData = res.data.productPrint;
+          this.printData.createTime = this.$layout.formatDate(
+            this.printData.createTime
+          );
+          this.isPrint = true;
         })
         .catch(err => {
           console.log(err);

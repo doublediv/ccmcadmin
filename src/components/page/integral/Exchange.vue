@@ -748,7 +748,7 @@ export default {
               this.orderData.totalConsumption = 0;
               this.isKeep = false;
               this.$Message.success("订单提交成功！");
-              this.refNo = res.data.refNo;
+              this.refNo = acct.data.refNo;
               this.isRefNo = false;
               // 更新数据
               this.getGoodsData(this.searchGoodsData);
