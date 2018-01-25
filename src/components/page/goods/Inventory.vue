@@ -59,7 +59,7 @@ export default {
       this.$http
         .post("/product_stock_list", jsonData)
         .then(res => {
-          console.log(res);
+          // console.log(res);
           this.tableData = res.data.product_stock;
           //   分页
           this.totalPage = res.data.paginator.totalCount;

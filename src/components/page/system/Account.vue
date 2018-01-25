@@ -382,6 +382,8 @@ export default {
               // console.log(res);
               if (res.data.status === 2001) {
                 _this.$Notice.error({ title: "帐号名已存在，添加失败!" });
+              } else if(res.data.status === 3002) {
+                 _this.$Notice.error({ title: "当前账号无法新增该权限" });
               } else {
                 _this.$refs[refName].resetFields();
                 _this.$Message.success("新增帐号成功!");
