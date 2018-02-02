@@ -28,7 +28,7 @@
                     <Select v-model="baseData.province" placeholder="请选择省" placement="top" @on-change="selectCity" style="width: 100%">
                         <Option v-for="(item, index) in provinceList" :value="item.name" :key="index">{{ item.name }}</Option>  
                     </Select>
-                    <Select :disabled="isZxs" v-model="baseData.city" placeholder="请选择市" placement="top" @on-change="selectArea" style="width: 100%">
+                    <Select v-model="baseData.city" placeholder="请选择市" placement="top" @on-change="selectArea" style="width: 100%">
                         <Option v-for="(item, index) in city" :value="item.name" :key="index">{{ item.name }}</Option>
                     </Select>
                     <Select v-model="baseData.area" placeholder="请选择区" placement="top" style="width: 100%">
@@ -173,7 +173,6 @@ export default {
       provinceList: provinceList,
       city: [],
       area: [],
-      isZxs: false,
       vipId: "",
       baseData: {
         realName: "",

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Table ref="table" :columns="tableColumns" :data="tableData" :no-data-text="defaultText" @on-row-click="selectRow" border></Table>
+        <Table ref="table" :columns="tableColumns" :data="tableData" no-data-text="暂无数据" @on-row-click="selectRow" border></Table>
         <Page class="page" v-if="isPage" :total="totalPage" :page-size="10" @on-change="changePage"></Page>
     </div>
 </template>

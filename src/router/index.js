@@ -25,7 +25,7 @@ export default new Router({
       children: [
         {
           path: '/',
-          name: '基站概况',
+          name: '数据',
           component: resolve => require(['../components/page/Index.vue'], resolve),
         },
         // 健康档案管理

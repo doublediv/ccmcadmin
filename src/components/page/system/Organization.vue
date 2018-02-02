@@ -33,6 +33,20 @@
             <FormItem label="名称:" prop="name">
                 <Input :disabled="!isNoJz" type="text" v-model="addOrganizationData.name" placeholder="请输入名称"></Input>
             </FormItem>
+            <FormItem label="所属省:" prop="province">
+                <Select v-model="addOrganizationData.province" placeholder="请选择省" @on-change="selectCity" style="width: 100%">
+                    <Option v-for="(item, index) in provinceList" :value="item.name" :key="index">{{ item.name }}</Option>  
+                </Select>
+            </FormItem>
+            <FormItem label="所属市:" prop="city">
+                <Select v-model="addOrganizationData.city" placeholder="请选择市" style="width: 100%">
+                    <Option v-for="(item, index) in cityList" :value="item.name" :key="index">{{ item.name }}</Option>
+                </Select>
+            </FormItem>
+            <FormItem label="经纬度:" prop="woven">
+                <Input type="text" v-model="addOrganizationData.woven" placeholder="请输入经纬度"></Input>
+                <p><span>示例：116.377823,40.004749</span> <a traget="_blank" href="http://api.map.baidu.com/lbsapi/getpoint/index.html">获取经纬度</a></p>
+            </FormItem>
         </Form>
         <div slot="footer" class="button-box">
             <Button type="ghost" @click="cancel('addOrganizationForm', 'isAddShow')">取消</Button>
@@ -43,6 +57,7 @@
 </template>
 <script>
 import vTable from "../../common/Table.vue";
+import provinceList from "@/assets/js/area.js";
 export default {
   components: { vTable },
   data() {
@@ -118,13 +133,21 @@ export default {
       isFgs: true,
       isJz: true,
       eidthformTitle: "",
+      provinceList: provinceList,
+      cityList: [],
       addOrganizationData: {
         category: "",
-        name: ""
+        name: "",
+        province: "",
+        city: "",
+        woven: ""
       },
       addOrganizationRules: {
         category: [{ required: true, message: "请输选择机构类型" }],
-        name: [{ required: true, message: "请输入基站名称" }]
+        name: [{ required: true, message: "请输入基站名称" }],
+        province: [{ required: true, message: "请选择省" }],
+        city: [{ required: true, message: "请选择市" }],
+        woven: [{ required: true, message: "请输入经纬度" }]
       },
       isKeep: false
     };
@@ -199,6 +222,20 @@ export default {
             _this.isSearch = false;
           }
         });
+    },
+    //   获取市
+    selectCity(provinceName) {
+      this.cityList = [];
+      this.provinceList.forEach(element => {
+        if (element.name === provinceName) {
+          this.cityList = element.cityList.map(e => {
+            return {
+              name: e.name
+            };
+          });
+        }
+        return false;
+      });
     },
     // 弹出新增机构类型
     showAddMechanismType() {

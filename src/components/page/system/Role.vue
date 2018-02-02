@@ -251,8 +251,8 @@ export default {
         })
         .catch(err => {
           console.log(err);
-          _this.isKeep = false;
-          _this.$Notice.error({ title: "权限设置失败!" });
+          this.isKeep = false;
+          this.$Notice.error({ title: "权限设置失败!" });
         });
     }
   }

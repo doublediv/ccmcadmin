@@ -35,6 +35,12 @@
                 <FormItem label="确认密码:" prop="repassword">
                     <Input type="password" v-model="addAccountData.repassword" placeholder="请确认密码"></Input>
                 </FormItem>
+                <FormItem label="帐号归属:" prop="belongTo">
+                    <Select v-model="addAccountData.belongTo" placeholder="请选择帐号归属" style="width:100%" @on-change="getRoleOption">
+                        <Option :value="companyId" :key="companyId">本机构</Option>
+                        <Option v-for="item in belongOption" :value="item.id" :key="item.id">{{item.name}}</Option>
+                    </Select>
+                </FormItem>
                 <FormItem label="使用者姓名:" prop="name">
                     <Input type="text" v-model="addAccountData.name" placeholder="请输入使用者姓名"></Input>
                 </FormItem>
@@ -136,6 +142,7 @@ export default {
       }
     };
     return {
+      companyId: "",
       roleOption: [],
       searchData: {
         phone: "",
@@ -164,7 +171,6 @@ export default {
                   style: { marginRight: "5px" },
                   on: {
                     click: () => {
-                      this.isEditShow = true;
                       this.editAccountData = JSON.parse(
                         JSON.stringify(params.row)
                       );
@@ -173,6 +179,8 @@ export default {
                       } else {
                         this.editAccountData.gender = "2";
                       }
+                      this.getRoleOption(this.editAccountData.companyId)
+                      this.isEditShow = true;
                     }
                   }
                 },
@@ -256,10 +264,12 @@ export default {
       tableData: [],
       isPage: false,
       isAddShow: false,
+      belongOption: [],
       addAccountData: {
         username: "",
         password: "",
         repassword: "",
+        belongTo: "",
         name: "",
         gender: "",
         phone: "",
@@ -269,6 +279,7 @@ export default {
         username: [{ required: true, message: "请输入帐号" }],
         password: [{ required: true, message: "请输入密码" }],
         repassword: [{ required: true, validator: rePassWordRule }],
+        belongTo: [{ required: true, message: "请选择帐号归属" }],
         name: [{ required: true, message: "请输入使用者姓名" }],
         gender: [{ required: true, message: "请选择性别" }],
         phone: [{ required: true, validator: phoneRule }],
@@ -279,6 +290,7 @@ export default {
         username: "",
         password: "",
         repassword: "",
+        belongTo: "",
         name: "",
         gender: "",
         phone: "",
@@ -288,6 +300,7 @@ export default {
         username: [{ required: true, message: "请输入帐号" }],
         repassword: [{ validator: editRePassWordRule }],
         name: [{ required: true, message: "请输入使用者姓名" }],
+        belongTo: [{ required: true, message: "请选择帐号归属" }],
         gender: [{ required: true, message: "请选择性别" }],
         phone: [{ required: true, validator: phoneRule }],
         roleId: [{ required: true, message: "请选择角色" }]
@@ -296,17 +309,20 @@ export default {
     };
   },
   created() {
-    this.getRoleOption();
+    this.companyId = localStorage.getItem("companyId");
+    if (localStorage.getItem("companyCategory") !== "3") {
+      this.getCompany();
+    }
     this.getUser();
   },
   methods: {
     //   获取角色列表
-    getRoleOption() {
+    getRoleOption(id) {
       const _this = this;
       this.$http
-        .post("/get_roles")
+        .post("/get_roles/" + id)
         .then(function(res) {
-          // console.log(res);
+          console.log(res);
           _this.roleOption = res.data.roles.map(function(e) {
             e.id = e.id.toString();
             return e;
@@ -315,6 +331,19 @@ export default {
         .catch(function(err) {
           console.log(err);
           _this.$Notice.error({ title: "角色列表获取失败！" });
+        });
+    },
+    // 获取直系子级机构
+    getCompany() {
+      this.$http
+        .post("/getcompanys")
+        .then(res => {
+          // console.log(res);
+          this.belongOption = res.data.companys;
+        })
+        .catch(err => {
+          this.$Notice.error({ title: "直系子级机构获取失败！" });
+          console.log(err);
         });
     },
     // 获取帐号列表
@@ -375,6 +404,7 @@ export default {
             JSON.stringify(this.addAccountData)
           );
           delete accountDataForAdmin.repassword;
+          delete accountDataForAdmin.belongTo;
           const _this = this;
           this.$http
             .post("/add_user", accountDataForAdmin)
@@ -382,8 +412,8 @@ export default {
               // console.log(res);
               if (res.data.status === 2001) {
                 _this.$Notice.error({ title: "帐号名已存在，添加失败!" });
-              } else if(res.data.status === 3002) {
-                 _this.$Notice.error({ title: "当前账号无法新增该权限" });
+              } else if (res.data.status === 3002) {
+                _this.$Notice.error({ title: "当前账号无新增权限" });
               } else {
                 _this.$refs[refName].resetFields();
                 _this.$Message.success("新增帐号成功!");
