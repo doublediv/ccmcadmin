@@ -43,6 +43,9 @@
                     <Option v-for="(item, index) in cityList" :value="item.name" :key="index">{{ item.name }}</Option>
                 </Select>
             </FormItem>
+            <FormItem label="地址:" prop="address">
+                <Input type="text" v-model="addOrganizationData.address" placeholder="请输入地址"></Input>
+            </FormItem>
             <FormItem label="经纬度:" prop="woven">
                 <Input type="text" v-model="addOrganizationData.woven" placeholder="请输入经纬度"></Input>
                 <p><span>示例：116.377823,40.004749</span> <a traget="_blank" href="http://api.map.baidu.com/lbsapi/getpoint/index.html">获取经纬度</a></p>
@@ -140,6 +143,7 @@ export default {
         name: "",
         province: "",
         city: "",
+        address: "",
         woven: ""
       },
       addOrganizationRules: {
@@ -147,6 +151,7 @@ export default {
         name: [{ required: true, message: "请输入基站名称" }],
         province: [{ required: true, message: "请选择省" }],
         city: [{ required: true, message: "请选择市" }],
+        address: [{ required: true, message: "请输入地址" }],
         woven: [{ required: true, message: "请输入经纬度" }]
       },
       isKeep: false

@@ -54,6 +54,7 @@ export default {
                 );
                 localStorage.setItem("companyId", res.data.user.companyId)
                 localStorage.setItem("username", res.data.user.userName);
+                localStorage.setItem("province", res.data.user.province);
                 localStorage.setItem(
                   "sidebarnav",
                   JSON.stringify(res.data.user.permission)
