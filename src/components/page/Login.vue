@@ -22,8 +22,8 @@ export default {
     return {
       isLogin: false,
       loginData: {
-        username: "admin",
-        password: "admin"
+        username: "",
+        password: ""
       },
       ruleLogin: {
         username: [{ required: true, message: "请输入帐号" }],

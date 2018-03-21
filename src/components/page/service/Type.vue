@@ -117,7 +117,7 @@
         </Form>
         <div slot="footer" class="button-box">
             <Button type="ghost" @click="cancel('editItemForm', 'isEditItem')">取消</Button>
-            <Button type="primary" :loading="isKeep"  @click="keepItem('editItemForm')">保存</Button>
+            <Button type="primary" :loading="isKeep"  @click="editItem('editItemForm')">保存</Button>
         </div>
     </Modal> 
   </div>
@@ -296,7 +296,7 @@ export default {
         .catch(err => {
           console.log(err);
           this.isGetServiceItem = false;
-          this.$Notice.error({ title: "服务项目失败！" });
+          this.$Notice.error({ title: "获取服务项目失败！" });
         });
     },
     //   获取数据
@@ -422,7 +422,7 @@ export default {
       });
     },
     // 编辑服务项目
-    keepItem(refName) {
+    editItem(refName) {
       this.$refs[refName].validate(valid => {
         if (valid) {
           this.isKeep = true;
